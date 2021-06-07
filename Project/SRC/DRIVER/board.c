@@ -24,6 +24,11 @@
 #include "drv_i2c.h"
 #include "rgb.h"
 
+#include "gpio.h"
+#include "fatfs.h"
+#include "quadspi.h"
+#include "sdmmc.h"
+
 static void SysPeriphClockInit(void);
 
 /**********************************************************************************************************
@@ -33,6 +38,12 @@ static void SysPeriphClockInit(void);
 *返 回 值: 无
 **********************************************************************************************************/
 void BoardInit(void) {
+
+    MX_GPIO_Init();
+    MX_SDMMC1_SD_Init();
+    MX_FATFS_Init();
+    MX_QUADSPI_Init();
+
     //RGB初始化
     RGB_Init();
 
@@ -70,7 +81,7 @@ void BoardInit(void) {
 void SoftDelayMs(uint32_t ms) {
     uint32_t us_cnt;
     for (; ms != 0; ms--) {
-        us_cnt = 42000;
+        us_cnt = 42000*4;
         while (us_cnt) {
             us_cnt--;
         }
@@ -86,7 +97,7 @@ void SoftDelayMs(uint32_t ms) {
 void SoftDelayUs(uint32_t us) {
     uint32_t us_cnt;
     for (; us != 0; us--) {
-        us_cnt = 35;
+        us_cnt = 35*4;
         while (us_cnt) {
             us_cnt--;
         }

@@ -21,11 +21,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "fatfs.h"
-#include "quadspi.h"
-#include "sdmmc.h"
-#include "spi.h"
 #include "usb_device.h"
-#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -111,7 +107,7 @@ portTASK_FUNCTION(vStartTask, pvParameters) {
     NavigationTaskCreate();
     ControlTaskCreate();
     MessageTaskCreate();
-    //LogTaskCreate();
+    LogTaskCreate();
 
     //vTaskDelete(NULL);
     for (;;) {
@@ -148,10 +144,6 @@ int main(void) {
     /* USER CODE END SysInit */
 
     /* Initialize all configured peripherals */
-    MX_GPIO_Init();
-    //MX_SDMMC1_SD_Init();
-    //MX_FATFS_Init();
-    //MX_QUADSPI_Init();
     /* USER CODE BEGIN 2 */
     //HAL_Delay(2000);
 
