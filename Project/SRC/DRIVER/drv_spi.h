@@ -5,10 +5,10 @@
 
 #include "spi.h"
 
-void Spi_Init(void);
+void SPI_Init(void);
 
-void Spi_GyroSingleWrite(uint8_t reg, uint8_t value);
-void Spi_GyroMultiRead(uint8_t reg,uint8_t *data, uint8_t length);
+void SPI_GyroSingleWrite(uint8_t reg, uint8_t value);
+void SPI_GyroMultiRead(uint8_t reg,uint8_t *data, uint8_t length);
 void Spi_BaroSingleWrite(uint8_t reg, uint8_t value);
 void Spi_BaroMultiRead(uint8_t reg,uint8_t *data, uint8_t length);
 

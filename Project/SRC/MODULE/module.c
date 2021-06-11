@@ -11,7 +11,9 @@
 **********************************************************************************************************/
 #include "module.h"
 #include "icm20689.h"
+#include "icm20948.h"
 #include "ms5611.h"
+#include "spl06-001.h"
 #include "ist8310.h"
 #include "ublox.h"
 #include "drv_pwm.h"
@@ -25,8 +27,7 @@
 *形    参: 陀螺仪数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-static void GyroSensorRotate(Vector3f_t* gyro)
-{
+static void GyroSensorRotate(Vector3f_t *gyro) {
     RotateVector3f(GYRO_ROTATION, gyro);
 }
 
@@ -36,8 +37,7 @@ static void GyroSensorRotate(Vector3f_t* gyro)
 *形    参: 加速度数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-static void AccSensorRotate(Vector3f_t *acc)
-{
+static void AccSensorRotate(Vector3f_t *acc) {
     RotateVector3f(ACC_ROTATION, acc);
 }
 
@@ -47,8 +47,7 @@ static void AccSensorRotate(Vector3f_t *acc)
 *形    参: 磁力计数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-static void MagSensorRotate(Vector3f_t *mag)
-{
+static void MagSensorRotate(Vector3f_t *mag) {
     RotateVector3f(MAG_ROTATION, mag);
 }
 
@@ -58,19 +57,24 @@ static void MagSensorRotate(Vector3f_t *mag)
 *形    参: 无
 *返 回 值: 陀螺仪存在状态
 **********************************************************************************************************/
-void GyroSensorInit(void)
-{
+void GyroSensorInit(void) {
     uint8_t detectFlag = 0;
 
-        if(ICM20689_Detect())
-        {
+    if(GYRO_TYPE == ICM20689){
+        if (ICM20689_Detect()) {
             ICM20689_Init();
             detectFlag = 1;
         }
-
+    }
+    else if(GYRO_TYPE == ICM20948){
+        if (ICM20948_Detect()) {
+            //ICM20948_Init();
+            detectFlag = 1;
+        }
+    }
 
     //未检测到陀螺仪
-    if(!detectFlag){
+    if (!detectFlag) {
         FaultDetectSetError(GYRO_UNDETECTED);
     }
 
@@ -82,18 +86,21 @@ void GyroSensorInit(void)
 *形    参: 无
 *返 回 值: 磁力计存在状态
 **********************************************************************************************************/
-void MagSensorInit(void)
-{
+void MagSensorInit(void) {
     uint8_t detectFlag = 0;
 
-        if(IST8310_Detect())
-        {
+    if(MAG_TYPE == IST8310){
+        if (IST8310_Detect()) {
             IST8310_Init();
             detectFlag = 1;
         }
+    }
+    else if(MAG_TYPE == ICM20948_MAG){
+
+    }
 
     //未检测到磁力计
-    if(!detectFlag) {
+    if (!detectFlag) {
         FaultDetectSetError(MAG_UNDETECTED);
     }
 }
@@ -104,20 +111,23 @@ void MagSensorInit(void)
 *形    参: 无
 *返 回 值: 气压计存在状态
 **********************************************************************************************************/
-void BaroSensorInit(void)
-{
+void BaroSensorInit(void) {
     uint8_t detectFlag = 0;
 
-    if(BARO_TYPE == SPL06)
-    {
-        if(MS5611_Detect())
-        {
+    if (BARO_TYPE == SPL06) {
+        if (spl0601_detect()) {
+            spl0601_init();
+            detectFlag = 1;
+        }
+
+    } else if (BARO_TYPE == MS5611) {
+        if (MS5611_Detect()) {
             MS5611_Init();
             detectFlag = 1;
         }
     }
     //未检测到气压计
-    if(!detectFlag){
+    if (!detectFlag) {
         FaultDetectSetError(BARO_UNDETECTED);
     }
 
@@ -129,8 +139,7 @@ void BaroSensorInit(void)
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-void GPSModuleInit(void)
-{
+void GPSModuleInit(void) {
     Ublox_Init();
 }
 
@@ -141,8 +150,7 @@ void GPSModuleInit(void)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void GyroSensorRead(Vector3f_t* gyro)
-{
+void GyroSensorRead(Vector3f_t *gyro) {
     ICM20689_ReadGyro(gyro);
 
     //传感器方向转换
@@ -155,8 +163,7 @@ void GyroSensorRead(Vector3f_t* gyro)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void AccSensorRead(Vector3f_t* acc)
-{
+void AccSensorRead(Vector3f_t *acc) {
     ICM20689_ReadAcc(acc);
 
     //传感器方向转换
@@ -169,8 +176,7 @@ void AccSensorRead(Vector3f_t* acc)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void TempSensorRead(float* temp)
-{
+void TempSensorRead(float *temp) {
     ICM20689_ReadTemp(temp);
 }
 
@@ -180,8 +186,7 @@ void TempSensorRead(float* temp)
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-void MagSensorUpdate(void)
-{
+void MagSensorUpdate(void) {
     IST8310_Update();
 }
 
@@ -191,8 +196,7 @@ void MagSensorUpdate(void)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void MagSensorRead(Vector3f_t* mag)
-{
+void MagSensorRead(Vector3f_t *mag) {
     IST8310_Read(mag);
 
     MagSensorRotate(mag);
@@ -204,9 +208,13 @@ void MagSensorRead(Vector3f_t* mag)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void BaroSensorUpdate(void)
-{
-    MS5611_Update();
+void BaroSensorUpdate(void) {
+
+    if (BARO_TYPE == SPL06) {
+        spl0601_update();
+    } else if (BARO_TYPE == MS5611) {
+        MS5611_Update();
+    }
 }
 
 /**********************************************************************************************************
@@ -215,9 +223,12 @@ void BaroSensorUpdate(void)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void BaroSensorRead(int32_t* baroAlt)
-{
-    MS5611_Read(baroAlt);
+void BaroSensorRead(int32_t *baroAlt) {
+    if (BARO_TYPE == SPL06) {
+        spl0601_ReadAlt(baroAlt);
+    } else if (BARO_TYPE == MS5611) {
+        MS5611_Read(baroAlt);
+    }
 }
 
 /**********************************************************************************************************
@@ -226,9 +237,13 @@ void BaroSensorRead(int32_t* baroAlt)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void BaroTemperatureRead(float* temp)
-{
-    MS5611_ReadTemp(temp);
+void BaroTemperatureRead(float *temp) {
+    if (BARO_TYPE == SPL06) {
+        spl0601_ReadTemp(temp);
+    } else if (BARO_TYPE == MS5611) {
+        MS5611_ReadTemp(temp);
+    }
+
 }
 
 /**********************************************************************************************************
@@ -237,8 +252,7 @@ void BaroTemperatureRead(float* temp)
 *形    参: 读出数据指针
 *返 回 值: 无
 **********************************************************************************************************/
-void TempControlSet(int16_t value)
-{
+void TempControlSet(int16_t value) {
 #if(configUSE_SENSORHEAT == 1)
     TempControlPWMSet(value);
 #else

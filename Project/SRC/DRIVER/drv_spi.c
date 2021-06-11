@@ -11,7 +11,7 @@
 **********************************************************************************************************/
 #include "drv_spi.h"
 
-void Spi_Init(void)
+void SPI_Init(void)
 {
     MX_SPI1_Init();
     MX_SPI2_Init();
@@ -20,52 +20,52 @@ void Spi_Init(void)
 }
 
 /**********************************************************************************************************
-*函 数 名: Spi_GyroEnable
+*函 数 名: SPI_GyroEnable
 *功能说明: 陀螺仪CS脚使能
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-void Spi_GyroEnable(void)
+void SPI_GyroEnable(void)
 {
     HAL_GPIO_WritePin(GYRO_CS_GPIO, GYRO_CS_PIN, 0);
 }
 
 /**********************************************************************************************************
-*函 数 名: Spi_GyroDisable
+*函 数 名: SPI_GyroDisable
 *功能说明: 陀螺仪CS脚失能
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-void Spi_GyroDisable(void)
+void SPI_GyroDisable(void)
 {
     HAL_GPIO_WritePin(GYRO_CS_GPIO, GYRO_CS_PIN, 1);
 }
 
 /**********************************************************************************************************
-*函 数 名: Spi_GyroSingleWrite
+*函 数 名: SPI_GyroSingleWrite
 *功能说明: 陀螺仪单个寄存器写入
 *形    参: 寄存器地址 写入值
 *返 回 值: 无
 **********************************************************************************************************/
-void Spi_GyroSingleWrite(uint8_t reg, uint8_t value)
+void SPI_GyroSingleWrite(uint8_t reg, uint8_t value)
 {
-    Spi_GyroEnable();
+    SPI_GyroEnable();
     HAL_SPI_Transmit(&GYRO_SPI, &reg, 1, 10);
     HAL_SPI_Transmit(&GYRO_SPI, &value, 1, 10);
-    Spi_GyroDisable();
+    SPI_GyroDisable();
 }
 
 /**********************************************************************************************************
-*函 数 名: Spi_GyroMultiRead
+*函 数 名: SPI_GyroMultiRead
 *功能说明: 陀螺仪多个寄存器读出
 *形    参: 寄存器地址 读出缓冲区 读出长度
 *返 回 值: 无
 **********************************************************************************************************/
-void Spi_GyroMultiRead(uint8_t reg, uint8_t *data, uint8_t length)
+void SPI_GyroMultiRead(uint8_t reg, uint8_t *data, uint8_t length)
 {
     reg = reg|0x80;
-    Spi_GyroEnable();
+    SPI_GyroEnable();
     HAL_SPI_Transmit(&GYRO_SPI, (&reg), 1, 10);
     HAL_SPI_Receive(&GYRO_SPI, data, length, HAL_MAX_DELAY);
-    Spi_GyroDisable();
+    SPI_GyroDisable();
 }

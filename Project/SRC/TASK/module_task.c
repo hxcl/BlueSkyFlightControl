@@ -96,7 +96,7 @@ portTASK_FUNCTION(vSensorUpdateTask, pvParameters)
         if(count % 2 == 0)
         {
             vTaskSuspendAll();
-            MagSensorUpdate();
+            //MagSensorUpdate();
             xTaskResumeAll();
         }
 

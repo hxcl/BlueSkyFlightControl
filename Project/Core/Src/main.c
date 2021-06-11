@@ -145,7 +145,6 @@ int main(void) {
 
     /* Initialize all configured peripherals */
     /* USER CODE BEGIN 2 */
-    //HAL_Delay(2000);
 
     xTaskHandle startTask;
 

@@ -61,7 +61,8 @@ enum
     MPU6000,
     MPU6500,
     ICM20602,
-    ICM20689
+    ICM20689,
+    ICM20948
 };
 
 enum
@@ -78,7 +79,8 @@ enum
     HMC5883,
     QMC5883,
     IST8310,
-    MMC3630
+    MMC3630,
+    ICM20948_MAG
 };
 
 enum

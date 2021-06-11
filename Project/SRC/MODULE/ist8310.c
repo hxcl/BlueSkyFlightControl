@@ -59,7 +59,6 @@ static Vector3i_t magRaw;
 **********************************************************************************************************/
 static void IST8310_WriteReg(uint8_t REG_Address,uint8_t REG_data)
 {
-    //Soft_I2c_Single_Write(MAG_I2C, IST8310_ADDRESS, REG_Address, REG_data);
     I2C_Single_Write(&MAG_I2C, IST8310_ADDRESS, REG_Address, REG_data);
 }
 
@@ -97,7 +96,7 @@ bool IST8310_Detect(void)
 void IST8310_Init(void)
 {
     IST8310_WriteReg(IST8310_REG_CNTRL1, IST8310_ODR_200_HZ);
-    SoftDelayMs(5);
+    HAL_Delay(5);
 }
 
 /**********************************************************************************************************
