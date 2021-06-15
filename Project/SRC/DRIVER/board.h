@@ -83,6 +83,15 @@ enum
     ICM20948_MAG
 };
 
+enum{
+    TFMINIPLUS
+};
+
+enum{
+    LC302,
+    VLX53xx,
+};
+
 enum
 {
     SBUS,

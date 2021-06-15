@@ -26,6 +26,8 @@
 #define GYRO_TYPE            ICM20689       //陀螺仪型号
 #define BARO_TYPE            SPL06          //气压计型号
 #define MAG_TYPE             IST8310        //罗盘型号
+#define ToFALTIMETER_TYPE    TFMINIPLUS
+#define OPTFLOW_TYPE         LC302
 
 #define configUSE_SENSORHEAT 0              //是否使用传感器恒温
 

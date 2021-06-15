@@ -1,8 +1,10 @@
 //
-// Created by 12484 on 2021/06/05.
+// Created by Liuyufanlyf on 2021/06/05.
 //
 
+#include "string.h"
 #include "tfminiplus.h"
+#include "board.h"
 
 tfminiplus_data_t tf_data;
 
@@ -10,9 +12,13 @@ void TFminiPlus_init(void) {
     tf_data.length = 0;
     tf_data.singal_strength = 0;
     tf_data.avaliable = false;
+
+    HAL_UART_Receive_DMA(&COM3, tf_data.raw_data, 9);
 }
 
-void TFminiPlus_update(uint8_t *raw) {
+void TFminiPlus_update(void) {
+    static uint8_t raw[9];
+    memcpy(raw, tf_data.raw_data, 9);
 
     // Once the first and the second bytes are both right,
     // checksum it's not necessary.
@@ -30,16 +36,20 @@ void TFminiPlus_update(uint8_t *raw) {
             tf_data.singal_strength = raw[4] + (raw[5] << 8);
             if (tf_data.singal_strength > 100 && tf_data.singal_strength < 65535) {
                 tf_data.avaliable = true;
+                memset(raw, 0, 9);
             } else {
                 tf_data.avaliable = false;
+                memset(raw, 0, 9);
                 return;
             }
         } else {
             tf_data.avaliable = false;
+            memset(raw, 0, 9);
             return;
         }
     } else {
         tf_data.avaliable = false;
+        memset(raw, 0, 9);
         return;
     }
 }

@@ -7,6 +7,8 @@ void GyroSensorInit(void);
 void MagSensorInit(void);
 void BaroSensorInit(void);
 void GPSModuleInit(void);
+void ToFAltitmeterInit(void);
+void OptFlowInit(void);
 
 void GyroSensorRead(Vector3f_t* gyro);
 void AccSensorRead(Vector3f_t* acc);

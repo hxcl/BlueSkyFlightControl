@@ -41,19 +41,13 @@ void Uart_Init() {
     MX_UART7_Init();
     MX_UART8_Init();
 
-    // bsklink/Mavlink via COM1(uart1)
+    // bsklink/Mavlink via COM1(huart1)
     HAL_UART_Receive_IT(&COM1, COM1RxBuf, 1);
 
-    // Copter computer communication via COM2(uart2)
+    // Copter computer communication via COM2(huart3)
     HAL_UART_Receive_IT(&COM2, COM2RxBuf, 32);
 
-    // Optflow communication via COM3(uart4)
-    HAL_UART_Receive_IT(&COM3, COM2RxBuf, 32);
-
-    // TFminiPlus LiDAR sensor via COM4(uart7)
-    HAL_UART_Receive_IT(&COM4, COM4RxBuf, 9);
-
-    // S.BUS via COM5(uart8)
+    // S.BUS via COM5(huart8)
     HAL_UART_Receive_IT(&COM5, COM5RxBuf, 25);
 }
 
@@ -118,12 +112,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     } else if (huart == &COM2) {
 
         HAL_UART_Receive_IT(&COM2, COM2RxBuf, 9);
-    } else if (huart == &COM3) {
-
-        HAL_UART_Receive_IT(&COM3, COM3RxBuf, 9);
-    } else if (huart == &COM4) {
-        TFminiPlus_update(COM4RxBuf);
-        HAL_UART_Receive_IT(&COM4, COM4RxBuf, 9);
     } else if (huart == &COM5) {
         for (uint8_t i = 0; i < 25; i++) {
             Sbus_Decode(COM5RxBuf[i]);

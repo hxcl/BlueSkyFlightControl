@@ -16,6 +16,8 @@
 #include "magnetometer.h"
 #include "barometer.h"
 #include "gps.h"
+#include "ToF_altimeter.h"
+#include "optflow.h"
 
 xTaskHandle imuDataPreTreatTask;
 xTaskHandle otherSensorTask;
@@ -109,6 +111,15 @@ portTASK_FUNCTION(vOtherSensorTask, pvParameters)
 
             //磁力计数据预处理
             MagDataPreTreat();
+        }
+
+        //50Hz
+        if(count % 4 == 0)
+        {
+            // ToF 激光测距高度传感器数据处理
+            ToFAltimeterDataTreat();
+            // 光流数据处理
+            OptflowDataTreat();
         }
 
         //25Hz

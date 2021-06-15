@@ -16,6 +16,8 @@
 #include "spl06-001.h"
 #include "ist8310.h"
 #include "ublox.h"
+#include "tfminiplus.h"
+#include "LC302.h"
 #include "drv_pwm.h"
 #include "rotation.h"
 
@@ -131,6 +133,18 @@ void BaroSensorInit(void) {
         FaultDetectSetError(BARO_UNDETECTED);
     }
 
+}
+
+void ToFAltitmeterInit(void){
+    if(ToFALTIMETER_TYPE == TFMINIPLUS){
+        TFminiPlus_init();
+    }
+}
+
+void OptFlowInit(void){
+    if(OPTFLOW_TYPE == LC302){
+        LC302_init();
+    }
 }
 
 /**********************************************************************************************************

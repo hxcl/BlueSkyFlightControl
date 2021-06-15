@@ -29,6 +29,8 @@
 #include "quadspi.h"
 #include "sdmmc.h"
 
+#include "module.h"
+
 static void SysPeriphClockInit(void);
 
 /**********************************************************************************************************
@@ -70,6 +72,10 @@ void BoardInit(void) {
 
     //ADC初始化
     Adc_Init();
+
+    ToFAltitmeterInit();
+
+    OptFlowInit();
 }
 
 /**********************************************************************************************************

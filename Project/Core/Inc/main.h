@@ -83,8 +83,12 @@ void Error_Handler(void);
 #define LCD_WR_RS_GPIO_Port GPIOE
 #define SPI2_CS_Pin GPIO_PIN_12
 #define SPI2_CS_GPIO_Port GPIOB
-#define SPI1_CS_Pin GPIO_PIN_6
-#define SPI1_CS_GPIO_Port GPIOD
+#define SDMMC_DETECT_Pin GPIO_PIN_4
+#define SDMMC_DETECT_GPIO_Port GPIOD
+#define SPI1_BARO_CS_Pin GPIO_PIN_5
+#define SPI1_BARO_CS_GPIO_Port GPIOD
+#define SPI1_FLASH_CS_Pin GPIO_PIN_6
+#define SPI1_FLASH_CS_GPIO_Port GPIOD
 #define SBUS_INV_Pin GPIO_PIN_9
 #define SBUS_INV_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
