@@ -19,8 +19,7 @@
 /**********************************************************************************************************
 *飞控硬件类型
 **********************************************************************************************************/
-enum
-{
+enum {
     BOARD_BLUESKY_V3 = 1,
     BOARD_FUTURESKY
 };
@@ -32,12 +31,13 @@ enum
 
 //硬件配置头文件包含
 #ifdef BLUESKY_V3
+
 #include "boardConfigBlueSkyV3.h"
+
 #define BOARD_TYPE BOARD_BLUESKY_V3
 #endif
 
-typedef struct
-{
+typedef struct {
     int16_t roll;
     int16_t pitch;
     int16_t yaw;
@@ -56,8 +56,7 @@ typedef struct
     int16_t aux12;
 } RCDATA_t;
 
-enum
-{
+enum {
     MPU6000,
     MPU6500,
     ICM20602,
@@ -65,8 +64,7 @@ enum
     ICM20948
 };
 
-enum
-{
+enum {
     BMP280,
     MS5611,
     _2SMPB,
@@ -74,8 +72,12 @@ enum
     SPL06
 };
 
-enum
-{
+enum {
+    BARO_USE_I2C,
+    BARO_USE_SPI
+};
+
+enum {
     HMC5883,
     QMC5883,
     IST8310,
@@ -83,27 +85,30 @@ enum
     ICM20948_MAG
 };
 
-enum{
+enum {
     TFMINIPLUS
 };
 
-enum{
+enum {
     LC302,
     VLX53xx,
 };
 
-enum
-{
+enum {
     SBUS,
     PPM
 };
 
 void BoardInit(void);
+
 void SoftDelayMs(uint32_t ms);
+
 void SoftDelayUs(uint32_t us);
+
 void OsDelayMs(uint32_t ms);
 
 uint64_t GetSysTimeUs(void);
+
 uint32_t GetSysTimeMs(void);
 
 #endif

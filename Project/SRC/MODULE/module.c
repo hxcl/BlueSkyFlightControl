@@ -62,15 +62,14 @@ static void MagSensorRotate(Vector3f_t *mag) {
 void GyroSensorInit(void) {
     uint8_t detectFlag = 0;
 
-    if(GYRO_TYPE == ICM20689){
+    if (GYRO_TYPE == ICM20689) {
         if (ICM20689_Detect()) {
             ICM20689_Init();
             detectFlag = 1;
         }
-    }
-    else if(GYRO_TYPE == ICM20948){
+    } else if (GYRO_TYPE == ICM20948) {
         if (ICM20948_Detect()) {
-            //ICM20948_Init();
+            ICM20948_Init();
             detectFlag = 1;
         }
     }
@@ -91,14 +90,15 @@ void GyroSensorInit(void) {
 void MagSensorInit(void) {
     uint8_t detectFlag = 0;
 
-    if(MAG_TYPE == IST8310){
+    if (MAG_TYPE == IST8310) {
         if (IST8310_Detect()) {
             IST8310_Init();
             detectFlag = 1;
         }
-    }
-    else if(MAG_TYPE == ICM20948_MAG){
-
+    } else if (MAG_TYPE == ICM20948_MAG) {
+        if(ICM20948_Detect()){
+            detectFlag = 1;
+        }
     }
 
     //未检测到磁力计
@@ -135,14 +135,14 @@ void BaroSensorInit(void) {
 
 }
 
-void ToFAltitmeterInit(void){
-    if(ToFALTIMETER_TYPE == TFMINIPLUS){
+void ToFAltitmeterInit(void) {
+    if (ToFALTIMETER_TYPE == TFMINIPLUS) {
         TFminiPlus_init();
     }
 }
 
-void OptFlowInit(void){
-    if(OPTFLOW_TYPE == LC302){
+void OptFlowInit(void) {
+    if (OPTFLOW_TYPE == LC302) {
         LC302_init();
     }
 }
@@ -165,7 +165,11 @@ void GPSModuleInit(void) {
 *返 回 值: 无
 **********************************************************************************************************/
 void GyroSensorRead(Vector3f_t *gyro) {
-    ICM20689_ReadGyro(gyro);
+    if (GYRO_TYPE == ICM20689) {
+        ICM20689_ReadGyro(gyro);
+    } else if (GYRO_TYPE == ICM20948) {
+        ICM20948_ReadGyro(gyro);
+    }
 
     //传感器方向转换
     GyroSensorRotate(gyro);
@@ -178,7 +182,11 @@ void GyroSensorRead(Vector3f_t *gyro) {
 *返 回 值: 无
 **********************************************************************************************************/
 void AccSensorRead(Vector3f_t *acc) {
-    ICM20689_ReadAcc(acc);
+    if (GYRO_TYPE == ICM20689) {
+        ICM20689_ReadAcc(acc);
+    } else if (GYRO_TYPE == ICM20948) {
+        ICM20948_ReadAcc(acc);
+    }
 
     //传感器方向转换
     AccSensorRotate(acc);
@@ -191,7 +199,11 @@ void AccSensorRead(Vector3f_t *acc) {
 *返 回 值: 无
 **********************************************************************************************************/
 void TempSensorRead(float *temp) {
-    ICM20689_ReadTemp(temp);
+    if (GYRO_TYPE == ICM20689) {
+        ICM20689_ReadTemp(temp);
+    } else if (GYRO_TYPE == ICM20948) {
+        ICM20948_ReadTemp(temp);
+    }
 }
 
 /**********************************************************************************************************
@@ -201,7 +213,12 @@ void TempSensorRead(float *temp) {
 *返 回 值: 无
 **********************************************************************************************************/
 void MagSensorUpdate(void) {
-    IST8310_Update();
+
+    if (GYRO_TYPE == IST8310) {
+        IST8310_Update();
+    } else if (GYRO_TYPE == ICM20948) {
+        //ICM20948_MAG_Update(temp);
+    }
 }
 
 /**********************************************************************************************************

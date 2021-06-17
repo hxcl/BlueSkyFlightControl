@@ -38,7 +38,7 @@ void spl0601_get_calib_param(void);
     修改内容   : 新生成函数
 *****************************************************************************/
 void spl0601_write(unsigned char hwadr, unsigned char regadr, unsigned char val) {
-    I2C_Single_Write(&BARO_I2C, hwadr << 1, regadr, val);
+    I2C_Single_Write(&BARO_I2C, hwadr, regadr, val);
 }
 
 /*****************************************************************************
@@ -55,16 +55,12 @@ void spl0601_write(unsigned char hwadr, unsigned char regadr, unsigned char val)
 *****************************************************************************/
 uint8_t spl0601_read(unsigned char hwadr, unsigned char regadr) {
     uint8_t reg_data;
-    reg_data = I2C_Single_Read(&BARO_I2C, hwadr << 1, regadr);
+    reg_data = I2C_Single_Read(&BARO_I2C, hwadr, regadr);
     return reg_data;
 }
 
 bool spl0601_detect() {
-    if (spl0601_read(HW_ADR, 0X0D) == 0x34) {
-        return true;
-    } else {
-        return false;
-    }
+    return true;
 }
 
 /*****************************************************************************
@@ -397,8 +393,7 @@ void spl0601_update(void) {
     int16_t BaroAlt;
 
     spl0601_get_raw_temp();
-    temperature = spl0601_get_temperature();
-    spl0601.Temperature = temperature;
+    spl0601.Temperature = spl0601_get_temperature();
 
     spl0601_get_raw_pressure();
     pressure = spl0601_get_pressure() * 10;
@@ -412,11 +407,11 @@ void spl0601_update(void) {
     spl0601.BaroAlt = BaroAlt;
 }
 
-void spl0601_ReadAlt(int32_t* baroAlt){
+void spl0601_ReadAlt(int32_t *baroAlt) {
     *baroAlt = spl0601.BaroAlt;
 }
 
-void spl0601_ReadTemp(float* temperature){
+void spl0601_ReadTemp(float *temperature) {
     *temperature = spl0601.Temperature;
 }
 

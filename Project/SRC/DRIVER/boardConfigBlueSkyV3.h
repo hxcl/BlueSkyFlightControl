@@ -23,17 +23,18 @@
 /**********************************************************************************************************
 *传感器配置
 **********************************************************************************************************/
-#define GYRO_TYPE            ICM20689       //陀螺仪型号
+#define GYRO_TYPE            ICM20948       //陀螺仪型号
 #define BARO_TYPE            SPL06          //气压计型号
+#define BARO_COMMUNICATE_TYPE   BARO_I2C    //气压计通信接口
 #define MAG_TYPE             IST8310        //罗盘型号
 #define ToFALTIMETER_TYPE    TFMINIPLUS
 #define OPTFLOW_TYPE         LC302
 
 #define configUSE_SENSORHEAT 0              //是否使用传感器恒温
 
-#define GYRO_SPI             hspi2              //陀螺仪SPI配置
-#define GYRO_CS_GPIO         GPIOB
-#define GYRO_CS_PIN          GPIO_PIN_12
+#define GYRO_SPI             hspi6              //陀螺仪SPI配置
+#define GYRO_CS_GPIO         GPIOA
+#define GYRO_CS_PIN          GPIO_PIN_4
 
 #define BARO_I2C             hi2c1              //气压计I2C配置
 
@@ -56,7 +57,7 @@
 
 #define TEMP_TIM_FREQ        1000000        //传感器恒温PWM输出定时器配置
 #define TEMP_TIM_PERIOD      2500
-#define TEMP_TIM             htim5
+#define TEMP_TIM             htim1
 #define TEMP_CH              1
 
 #define PWM_TIM_1            htim2
@@ -123,7 +124,7 @@
 #define ADDR_FLASH_SECTOR_6_BANK2     ((uint32_t)0x081C0000) /* Base @ of Sector 6, 128 Kbytes */
 #define ADDR_FLASH_SECTOR_7_BANK2     ((uint32_t)0x081E0000) /* Base @ of Sector 7, 128 Kbytes */
 
-#define FLASH_USER_PARA_START_ADDR      ADDR_FLASH_SECTOR_7_BANK1  	//用户参数存储区
+#define FLASH_USER_PARA_START_ADDR      ADDR_FLASH_SECTOR_7_BANK1    //用户参数存储区
 
 /**********************************************************************************************************
 *串口配置
@@ -152,7 +153,7 @@
 **********************************************************************************************************/
 #define TIM1_CLOCK                    PPM_TIM_FREQ
 #define TIM1_PERIOD                   PPM_TIM_PERIOD
-#define TIM1_IRQ_PRIORITY 			  3
+#define TIM1_IRQ_PRIORITY              3
 #define TIM1_PWM_OUT                  0
 #define TIM1_PPM_IN                   1
 #if(configUSE_TIM1_CH1 == 1)
@@ -178,7 +179,7 @@
 
 #define TIM2_CLOCK                    PWM_TIM_FREQ
 #define TIM2_PERIOD                   PWM_TIM_PERIOD
-#define TIM2_IRQ_PRIORITY 			  3
+#define TIM2_IRQ_PRIORITY              3
 #define TIM2_PWM_OUT                  1
 #define TIM2_PPM_IN                   0
 #if(configUSE_TIM2_CH1 == 1)
@@ -204,7 +205,7 @@
 
 #define TIM3_CLOCK                    PWM_TIM_FREQ
 #define TIM3_PERIOD                   PWM_TIM_PERIOD
-#define TIM3_IRQ_PRIORITY 			  3
+#define TIM3_IRQ_PRIORITY              3
 #define TIM3_PWM_OUT                  1
 #define TIM3_PPM_IN                   0
 #if(configUSE_TIM3_CH1 == 1)
@@ -230,7 +231,7 @@
 
 #define TIM4_CLOCK                    PPM_TIM_FREQ
 #define TIM4_PERIOD                   PPM_TIM_PERIOD
-#define TIM4_IRQ_PRIORITY 			  3
+#define TIM4_IRQ_PRIORITY              3
 #define TIM4_PWM_OUT                  1
 #define TIM4_PPM_IN                   0
 #if(configUSE_TIM4_CH1 == 1)
@@ -256,7 +257,7 @@
 
 #define TIM12_CLOCK                   TEMP_TIM_FREQ
 #define TIM12_PERIOD                  TEMP_TIM_PERIOD
-#define TIM12_IRQ_PRIORITY 			  3
+#define TIM12_IRQ_PRIORITY              3
 #define TIM12_PWM_OUT                 1
 #define TIM12_PPM_IN                  0
 #if(configUSE_TIM12_CH1 == 1)
