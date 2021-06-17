@@ -385,8 +385,10 @@ float spl0601_get_pressure(void) {
 }
 
 void spl0601_update(void) {
-    // uint16_t calibratingB = 10;
-    // float logBaroGroundPressureSum;
+    float temperature;
+    float pressure;
+    uint16_t calibratingB = 10;
+    float logBaroGroundPressureSum;
     float Tempbaro;
     int16_t BaroAlt;
 
@@ -394,14 +396,13 @@ void spl0601_update(void) {
     spl0601.Temperature = spl0601_get_temperature();
 
     spl0601_get_raw_pressure();
-    spl0601.Pressure = spl0601_get_pressure();
+    pressure = spl0601_get_pressure() * 10;
 
-    // if (calibratingB > 0) {
-    //     logBaroGroundPressureSum = pressure;
-    //     calibratingB--;
-    // }
-
-    Tempbaro = (float) (p_spl0601.Pressure / 101325.0f);
+    if (calibratingB > 0) {
+        logBaroGroundPressureSum = pressure;
+        calibratingB--;
+    }
+    Tempbaro = (float) (pressure / logBaroGroundPressureSum) * 1.0;
     BaroAlt = 4433000.0f * (1 - powf((float) (Tempbaro), 0.190295f));
     spl0601.BaroAlt = BaroAlt;
 }
