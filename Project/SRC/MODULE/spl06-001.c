@@ -406,7 +406,6 @@ void spl0601_update(void) {
     spl0601.BaroAlt = BaroAlt;
 }
 
-
 void spl0601_ReadAlt(int32_t *baroAlt) {
     *baroAlt = spl0601.BaroAlt;
 }
