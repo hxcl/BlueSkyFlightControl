@@ -401,7 +401,7 @@ void spl0601_update(void) {
     //     calibratingB--;
     // }
 
-    Tempbaro = (float) (p_spl0601.Pressure / 101325.0f);
+    Tempbaro = (float) (p_spl0601->Pressure / 101325.0f);
     BaroAlt = 4433000.0f * (1 - powf((float) (Tempbaro), 0.190295f));
     spl0601.BaroAlt = BaroAlt;
 }
