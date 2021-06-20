@@ -9,6 +9,8 @@
  * @网站     bbs.loveuav.com
  * @日期     2018.05
 **********************************************************************************************************/
+#include "TaskConfig.h"
+
 #include "parameter.h"
 #include "drv_flash.h"
 #include "mathTool.h"
@@ -154,6 +156,9 @@ void ParamSaveToFlash(void)
 
     if(param_save_cnt == 1)
     {
+        // 关闭系统调度
+        //vTaskSuspendAll();
+
         //保存参数数量
         dataNum = PARAM_NUM;
         memcpy(param_data+PARAM_CHECK_NUM*4, &dataNum, 4);
@@ -165,13 +170,21 @@ void ParamSaveToFlash(void)
         }
         memcpy(param_data+PARAM_CHECK_SUM*4, &dataSum, 4);
 
-        uint32_t flashword_num = PARAM_NUM/8 + 1;
+        // 目前的参数数量是50，占用200Byte的储存空间，同时因为H743一次要写入32Byte的数据，因此总共要写入224Byte的数据
+        uint32_t writeNum = 7;
 
-        Flash_WriteFLASHWORD(FLASH_USER_PARA_START_ADDR, param_data, flashword_num);
+        Flash_WriteFLASHWORD(FLASH_USER_PARA_START_ADDR, param_data, writeNum);
+
+        //param_save_cnt--;
+
+        // 启动系统调度
+        //xTaskResumeAll();
     }
 
     if(param_save_cnt > 0)
         param_save_cnt--;
+
+    return;
 }
 
 /**********************************************************************************************************

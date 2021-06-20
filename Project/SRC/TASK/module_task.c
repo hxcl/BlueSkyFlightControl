@@ -96,7 +96,7 @@ portTASK_FUNCTION(vSensorUpdateTask, pvParameters)
         if(count % 2 == 0)
         {
             vTaskSuspendAll();
-            //MagSensorUpdate();
+            MagSensorUpdate();
             xTaskResumeAll();
         }
 
@@ -110,7 +110,7 @@ portTASK_FUNCTION(vSensorUpdateTask, pvParameters)
         }
 
         //飞控参数保存(参数有更新才会执行）20Hz
-        if(count % 10 == 0)
+        if(count % 100 == 0)
         {
             ParamSaveToFlash();
         }

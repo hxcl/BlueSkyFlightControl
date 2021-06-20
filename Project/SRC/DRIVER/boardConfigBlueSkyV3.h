@@ -124,7 +124,7 @@
 #define ADDR_FLASH_SECTOR_6_BANK2     ((uint32_t)0x081C0000) /* Base @ of Sector 6, 128 Kbytes */
 #define ADDR_FLASH_SECTOR_7_BANK2     ((uint32_t)0x081E0000) /* Base @ of Sector 7, 128 Kbytes */
 
-#define FLASH_USER_PARA_START_ADDR      ADDR_FLASH_SECTOR_7_BANK1    //用户参数存储区
+#define     FLASH_USER_PARA_START_ADDR      ADDR_FLASH_SECTOR_7_BANK1    //用户参数存储区
 
 /**********************************************************************************************************
 *串口配置

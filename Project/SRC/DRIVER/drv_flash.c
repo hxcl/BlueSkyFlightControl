@@ -91,30 +91,22 @@ bool Flash_WriteFLASHWORD(uint32_t dest, uint8_t *src, uint32_t length) {
     HAL_FLASH_Unlock();
 
     start_addr = dest;            //写入的起始地址
-    end_addr = dest + length;    //写入的结束地址
+    end_addr = dest + 50;         //写入的结束地址：五十个参数
 
-    while (start_addr < end_addr) {
-        if (Flash_ReadWord(start_addr) != 0XFFFFFFFF)//有非0XFFFFFFFF的地方，要擦除这个扇区
-        {
-            /* Fill EraseInit structure*/
-            EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
-            EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-            EraseInitStruct.Banks = FLASH_BANK_1;
-            EraseInitStruct.Sector = GetSector(start_addr);
-            EraseInitStruct.NbSectors = 1;
-            if (HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK) {
-                return_value = false; //发生错误了
-                break;
-            }
-        } else
-            start_addr += 4;
+    EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
+    EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+    EraseInitStruct.Banks = FLASH_BANK_1;
+    EraseInitStruct.Sector = FLASH_USER_PARA_START_ADDR;
+    EraseInitStruct.NbSectors = 1;
+    if (HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK) {
+        return_value = false;
     }
 
-    uint32_t Address = start_addr;
+    uint32_t Address = dest;
 
-    while (Address < end_addr) {
+    for (int i = 0; i < 7; i++) {
         // FLASHWORD 256bit
-        if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, Address, *src) == HAL_OK) {
+        if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, Address, src) == HAL_OK) {
             Address += 32;
             src += 32;
         } else {
@@ -124,6 +116,8 @@ bool Flash_WriteFLASHWORD(uint32_t dest, uint8_t *src, uint32_t length) {
     }
 
     HAL_FLASH_Lock();
+
+    return_value = true;
 
     return return_value;
 }

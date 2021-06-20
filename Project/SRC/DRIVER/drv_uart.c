@@ -42,7 +42,7 @@ void Uart_Init() {
     MX_UART8_Init();
 
     // bsklink/Mavlink via COM1(huart1)
-    HAL_UART_Receive_IT(&COM1, COM1RxBuf, 1);
+    HAL_UART_Receive_DMA(&COM1, COM1RxBuf, 1);
 
     // Copter computer communication via COM2(huart3)
     HAL_UART_Receive_IT(&COM2, COM2RxBuf, 32);
@@ -102,13 +102,10 @@ void Uart_SendData(uint8_t deviceNum, uint8_t *DataToSend, uint8_t length) {
     }
 }
 
-// bsklink 的接收逻辑相当简单，打开串口接收非空，一个一个接收，每次接收都调用一次bsklink解析函数，一个一个填进结构体里面
-// 直到接收完成
-// 我的构思是，在bsklink初始化的时候就HAL_UART_Receive_IT(1)使能中断，然后在回调函数中调用bsklink解析并再次启动HAL_UART_RECEIVE_IT(1)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart == &COM1) {
         BsklinkDecode(COM1RxBuf[0]);
-        HAL_UART_Receive_IT(&huart1, COM1RxBuf, 1);
+        //HAL_UART_Receive_IT(&huart1, COM1RxBuf, 1);
     } else if (huart == &COM2) {
 
         HAL_UART_Receive_IT(&COM2, COM2RxBuf, 9);

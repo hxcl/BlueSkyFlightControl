@@ -17,6 +17,7 @@
 #include "diskio.h"
 #include <stdio.h>
 #include <string.h>
+#include <fatfs.h>
 
 #include "board.h"
 #include "flightStatus.h"
@@ -43,7 +44,7 @@ void LoggerInit(void)
     TCHAR testName[] = "0:init.test";
 
     //挂载文件系统
-    f_mount(0, &fs, 0);
+    f_mount(&SDFatFS, (TCHAR const*)SDPath, 1);
 
     //打开文件
     for(uint8_t i=10; i>0; i--)
