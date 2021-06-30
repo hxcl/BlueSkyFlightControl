@@ -48,7 +48,7 @@ void Uart_Init() {
     HAL_UART_Receive_IT(&COM2, COM2RxBuf, 32);
 
     // S.BUS via COM5(huart8)
-    HAL_UART_Receive_IT(&COM5, COM5RxBuf, 25);
+    HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
 }
 
 static UartCallback uart1CallbackFunc;
@@ -110,9 +110,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
         HAL_UART_Receive_IT(&COM2, COM2RxBuf, 9);
     } else if (huart == &COM5) {
-        for (uint8_t i = 0; i < 25; i++) {
-            Sbus_Decode(COM5RxBuf[i]);
-        }
-        HAL_UART_Receive_IT(&COM5, COM5RxBuf, 25);
+        Sbus_Decode(COM5RxBuf[0]);
+        HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
     }
 }

@@ -110,12 +110,14 @@ void MX_UART8_Init(void)
   huart8.Init.WordLength = UART_WORDLENGTH_9B;
   huart8.Init.StopBits = UART_STOPBITS_2;
   huart8.Init.Parity = UART_PARITY_EVEN;
-  huart8.Init.Mode = UART_MODE_TX_RX;
+  huart8.Init.Mode = UART_MODE_RX;
   huart8.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart8.Init.OverSampling = UART_OVERSAMPLING_16;
   huart8.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart8.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  huart8.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  huart8.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_RXOVERRUNDISABLE_INIT|UART_ADVFEATURE_DMADISABLEONERROR_INIT;
+  huart8.AdvancedInit.OverrunDisable = UART_ADVFEATURE_OVERRUN_DISABLE;
+  huart8.AdvancedInit.DMADisableonRxError = UART_ADVFEATURE_DMA_DISABLEONRXERROR;
   if (HAL_UART_Init(&huart8) != HAL_OK)
   {
     Error_Handler();

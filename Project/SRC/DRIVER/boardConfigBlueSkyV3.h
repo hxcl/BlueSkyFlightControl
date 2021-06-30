@@ -23,7 +23,7 @@
 /**********************************************************************************************************
 *传感器配置
 **********************************************************************************************************/
-#define GYRO_TYPE            ICM20948       //陀螺仪型号
+#define GYRO_TYPE            MPU6500        //陀螺仪型号
 #define BARO_TYPE            SPL06          //气压计型号
 #define BARO_COMMUNICATE_TYPE   BARO_I2C    //气压计通信接口
 #define MAG_TYPE             IST8310        //罗盘型号
@@ -49,7 +49,7 @@
 #define SBUS_UART            8              //SBUS接收机串口配置
 #define SBUS_BAUDRATE        100000
 
-#define SBUS_INV             0              //SBUS接收反向设置
+#define SBUS_INV             1              //SBUS接收反向设置
 #define SBUS_INV_GPIO        GPIOB
 #define SBUS_INV_PIN         GPIO_PIN_9
 

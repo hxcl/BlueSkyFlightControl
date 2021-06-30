@@ -79,24 +79,19 @@ uint32_t GetSector(uint32_t Address) {
 *返 回 值: 写入状态
 **********************************************************************************************************/
 bool Flash_WriteFLASHWORD(uint32_t dest, uint8_t *src, uint32_t length) {
-    FLASH_EraseInitTypeDef EraseInitStruct;
     uint32_t SectorError = 0;
     bool return_value = false;
-    uint32_t start_addr = 0;
-    uint32_t end_addr = 0;
 
     if (dest < FLASH_BASE_ADDR || dest > FLASH_END_ADDR) //非法地址
         return false;
 
     HAL_FLASH_Unlock();
 
-    start_addr = dest;            //写入的起始地址
-    end_addr = dest + 50;         //写入的结束地址：五十个参数
-
+    FLASH_EraseInitTypeDef EraseInitStruct;
     EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
     EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
     EraseInitStruct.Banks = FLASH_BANK_1;
-    EraseInitStruct.Sector = FLASH_USER_PARA_START_ADDR;
+    EraseInitStruct.Sector = GetSector(FLASH_USER_PARA_START_ADDR);
     EraseInitStruct.NbSectors = 1;
     if (HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK) {
         return_value = false;

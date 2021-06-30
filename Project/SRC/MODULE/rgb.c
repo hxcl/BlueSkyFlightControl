@@ -20,11 +20,11 @@ Green - PC4
 Red   - PC5
 */
 #define LED_BLUE_GPIO     GPIOE
-#define LED_BLUE_PIN      GPIO_PIN_4
+#define LED_BLUE_PIN      GPIO_PIN_6
 #define LED_GREEN_GPIO    GPIOE
-#define LED_GREEN_PIN     GPIO_PIN_6
+#define LED_GREEN_PIN     GPIO_PIN_5
 #define LED_RED_GPIO      GPIOE
-#define LED_RED_PIN       GPIO_PIN_5
+#define LED_RED_PIN       GPIO_PIN_4
 
 void RGB_Green_On(void) {
     HAL_GPIO_WritePin(LED_GREEN_GPIO, LED_GREEN_PIN, 0);

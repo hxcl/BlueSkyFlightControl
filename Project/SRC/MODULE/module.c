@@ -12,6 +12,8 @@
 #include "module.h"
 #include "icm20689.h"
 #include "icm20948.h"
+#include "icm20602.h"
+#include "mpu6500.h"
 #include "ms5611.h"
 #include "spl06-001.h"
 #include "ist8310.h"
@@ -72,6 +74,16 @@ void GyroSensorInit(void) {
             ICM20948_Init();
             detectFlag = 1;
         }
+    } else if (GYRO_TYPE == ICM20602) {
+        if (ICM20602_Detect()) {
+            ICM20602_Init();
+            detectFlag = 1;
+        }
+    } else if (GYRO_TYPE == MPU6500) {
+        if (MPU6500_Detect()) {
+            MPU6500_Init();
+            detectFlag = 1;
+        }
     }
 
     //未检测到陀螺仪
@@ -96,7 +108,7 @@ void MagSensorInit(void) {
             detectFlag = 1;
         }
     } else if (MAG_TYPE == ICM20948_MAG) {
-        if(ICM20948_Detect()){
+        if (ICM20948_Detect()) {
             detectFlag = 1;
         }
     }
@@ -169,9 +181,13 @@ void GyroSensorRead(Vector3f_t *gyro) {
         ICM20689_ReadGyro(gyro);
     } else if (GYRO_TYPE == ICM20948) {
         ICM20948_ReadGyro(gyro);
+    } else if (GYRO_TYPE == ICM20602) {
+        ICM20602_ReadGyro(gyro);
+    } else if (GYRO_TYPE == MPU6500) {
+        MPU6500_ReadGyro(gyro);
     }
 
-    //传感器方向转换
+//传感器方向转换
     GyroSensorRotate(gyro);
 }
 
@@ -186,6 +202,10 @@ void AccSensorRead(Vector3f_t *acc) {
         ICM20689_ReadAcc(acc);
     } else if (GYRO_TYPE == ICM20948) {
         ICM20948_ReadAcc(acc);
+    } else if (GYRO_TYPE == ICM20602) {
+        ICM20602_ReadAcc(acc);
+    } else if (GYRO_TYPE == MPU6500) {
+        MPU6500_ReadAcc(acc);
     }
 
     //传感器方向转换
@@ -203,6 +223,10 @@ void TempSensorRead(float *temp) {
         ICM20689_ReadTemp(temp);
     } else if (GYRO_TYPE == ICM20948) {
         ICM20948_ReadTemp(temp);
+    } else if (GYRO_TYPE == ICM20602) {
+        ICM20602_ReadTemp(temp);
+    } else if (GYRO_TYPE == MPU6500) {
+        MPU6500_ReadTemp(temp);
     }
 }
 
@@ -214,9 +238,9 @@ void TempSensorRead(float *temp) {
 **********************************************************************************************************/
 void MagSensorUpdate(void) {
 
-    if (GYRO_TYPE == IST8310) {
+    if (MAG_TYPE == IST8310) {
         IST8310_Update();
-    } else if (GYRO_TYPE == ICM20948) {
+    } else if (MAG_TYPE == ICM20948) {
         //ICM20948_MAG_Update(temp);
     }
 }

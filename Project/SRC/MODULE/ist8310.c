@@ -21,7 +21,7 @@
   VDD   |   VDD  |  0FH  | 1EH
   如果CAD1和CAD0都悬空, 地址为0EH
  */
-#define IST8310_ADDRESS                 0x1E
+#define IST8310_ADDRESS                 0x0E
 
 #define IST8310_REG_HX_L                0x03
 #define IST8310_REG_HX_H                0x04
