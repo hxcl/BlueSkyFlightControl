@@ -21,8 +21,8 @@
 #define MIDCHECK        1500
 #define MAXCHECK        1850
 
-#define RC_LEGAL_MIN    980
-#define RC_LEGAL_MAX    2020
+#define RC_LEGAL_MIN    950
+#define RC_LEGAL_MAX    2120
 
 #define AUX_CHECK_LOW   1100
 #define AUX_CHECK_MID   1500
@@ -70,7 +70,7 @@ void RcInit(void)
     rcData.aux12    = 1500;
 
     //设置各辅助通道对应的飞行模式
-    rcAuxMode[AUX1][LOW]  = SEMIAUTO;
+    rcAuxMode[AUX1][LOW]  = MANUAL;
     rcAuxMode[AUX1][MID]  = AUTO;
     rcAuxMode[AUX1][HIGH] = RETURNTOHOME;
 
