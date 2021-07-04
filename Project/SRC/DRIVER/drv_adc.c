@@ -21,6 +21,22 @@ void Adc_Init(void)
 {
     MX_ADC1_Init();
     MX_ADC2_Init();
+
+    if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
+        Error_Handler();
+    }
+
+    if (HAL_ADCEx_Calibration_Start(&hadc2, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK) {
+        Error_Handler();
+    }
+
+    if (HAL_ADC_Start(&hadc1) != HAL_OK) {
+        Error_Handler();
+    }
+
+    if (HAL_ADC_Start(&hadc2) != HAL_OK) {
+        Error_Handler();
+    }
 }
 
 /**********************************************************************************************************
@@ -32,6 +48,8 @@ void Adc_Init(void)
 uint16_t GetVoltageAdcValue(void)
 {
     static uint16_t adcTemp;
+
+    //HAL_ADC_PollForConversion(&ADC_VOLTAGE, 1);
 
     adcTemp = HAL_ADC_GetValue(&ADC_VOLTAGE);
 
@@ -47,6 +65,8 @@ uint16_t GetVoltageAdcValue(void)
 uint16_t GetCurrentAdcValue(void)
 {
     static uint16_t adcTemp;
+
+    //HAL_ADC_PollForConversion(&ADC_CURRENT, 1);
 
     adcTemp = HAL_ADC_GetValue(&ADC_CURRENT);
 

@@ -71,8 +71,8 @@ void RcInit(void)
 
     //设置各辅助通道对应的飞行模式
     rcAuxMode[AUX1][LOW]  = MANUAL;
-    rcAuxMode[AUX1][MID]  = AUTO;
-    rcAuxMode[AUX1][HIGH] = RETURNTOHOME;
+    rcAuxMode[AUX1][MID]  = SEMIAUTO;
+    rcAuxMode[AUX1][HIGH] = AUTO;
 
     rcAuxMode[AUX2][LOW]  = 0xFF;//AUTO;
     rcAuxMode[AUX2][MID]  = 0xFF;//AUTOLAND;
@@ -201,7 +201,7 @@ static void RcCheckSticks(void)
             if(armedCheckFlag == 0)
             {
                 //持续3秒后强制上锁
-                if(GetSysTimeMs() - armedCheckTime > 3000)
+                if(GetSysTimeMs() - armedCheckTime > 2000)
                 {
                     SetArmedStatus(DISARMED);
 
@@ -287,6 +287,7 @@ static void RcCheckAux(void)
             if(auxStatus[AUX2] != LOW)
             {
                 auxStatus[AUX2] = LOW;
+                SetArmedStatus(DISARMED);
                 SetFlightMode(rcAuxMode[AUX2][LOW]);
             }
         }

@@ -26,7 +26,6 @@
 
 #include "gpio.h"
 #include "fatfs.h"
-#include "quadspi.h"
 #include "sdmmc.h"
 
 #include "module.h"

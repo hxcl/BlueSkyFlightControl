@@ -18,14 +18,14 @@ typedef struct {
 
 extern tfminiplus_data_t tf_data;
 
-void TFminiPlus_init(void);
+void TFminiPlus_Init(void);
 
-void TFminiPlus_update(void);
+void TFminiPlus_Decode(uint8_t data);
 
-int TFminiPlus_getDistance(void);
+int TFminiPlus_GetDistance(void);
 
-int TFminiPlus_getSignalStrength(void);
+int TFminiPlus_GetSignalStrength(void);
 
-bool TFminiPlus_getAvaliable(void);
+bool TFminiPlus_GetAvaliable(void);
 
 #endif //TFMINIPLUS_H

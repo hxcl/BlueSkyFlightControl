@@ -44,8 +44,8 @@ void Uart_Init() {
     // bsklink/Mavlink via COM1(huart1)
     HAL_UART_Receive_DMA(&COM1, COM1RxBuf, 1);
 
-    // Copter computer communication via COM2(huart3)
-    HAL_UART_Receive_IT(&COM2, COM2RxBuf, 32);
+    // ToF sensor communication via COM2(huart3)
+    HAL_UART_Receive_DMA(&COM2, COM2RxBuf, 1);
 
     // S.BUS via COM5(huart8)
     HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
@@ -107,8 +107,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         BsklinkDecode(COM1RxBuf[0]);
         //HAL_UART_Receive_IT(&huart1, COM1RxBuf, 1);
     } else if (huart == &COM2) {
-
-        HAL_UART_Receive_IT(&COM2, COM2RxBuf, 9);
+        TFminiPlus_Decode(COM2RxBuf[0]);
+        //HAL_UART_Receive_IT(&COM2, COM2RxBuf, 1);
     } else if (huart == &COM5) {
         Sbus_Decode(COM5RxBuf[0]);
         HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);

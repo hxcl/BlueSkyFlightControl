@@ -937,10 +937,10 @@ void BsklinkSendUserDefine(uint8_t* sendFlag)
         *sendFlag = DISABLE;
 
     //数据负载填充
-    payload.data1   = TFminiPlus_getDistance();
-    payload.data2   = TFminiPlus_getSignalStrength()/100;
-    payload.data3   = TFminiPlus_getAvaliable();
-    payload.data4   = Get_OSCPUusage()*10;
+    payload.data1   = TFminiPlus_GetDistance();
+    payload.data2   = TFminiPlus_GetSignalStrength()/100;
+    payload.data3   = TFminiPlus_GetAvaliable();
+    payload.data4   = Get_OSCPUusage()*1000;
     payload.data5   = 5;
     payload.data6   = 6;
     payload.data7   = 7;

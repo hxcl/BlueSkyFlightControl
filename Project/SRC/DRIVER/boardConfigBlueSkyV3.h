@@ -85,13 +85,13 @@
 #define SERVO_PWM4_TIM             htim4
 #define SERVO_PWM4_CH              TIM_CHANNEL_4
 
-#define ADC_VOLTAGE          hadc1           //电池电压采集ADC配置
+#define ADC_VOLTAGE          hadc2           //电池电压采集ADC配置
 #define ADC_VOLTAGE_CHAN     ADC_Channel_11
 #define ADC_VOLTAGE_GPIO     GPIOC
 #define ADC_VOLTAGE_PIN      GPIO_PIN_1
 #define ADC_VOLTAGE_COEF     10.0f
 
-#define ADC_CURRENT          hadc2           //电池电流采集ADC配置
+#define ADC_CURRENT          hadc1           //电池电流采集ADC配置
 #define ADC_CURRENT_CHAN     ADC_Channel_12
 #define ADC_CURRENT_GPIO     GPIOC
 #define ADC_CURRENT_PIN      GPIO_PIN_2

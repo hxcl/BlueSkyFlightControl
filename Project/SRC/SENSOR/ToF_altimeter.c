@@ -8,6 +8,7 @@
 #include "flightStatus.h"
 #include "faultDetect.h"
 #include "tfminiplus.h"
+#include "ahrs.h"
 
 typedef struct {
     int32_t alt;
@@ -27,12 +28,9 @@ void ToFAltimeterDataTreat(void) {
     float deltaT = (GetSysTimeUs() - lastTime) * 1e-6;
     lastTime = GetSysTimeUs();
 
-    //
-    TFminiPlus_update();
-    if(TFminiPlus_getAvaliable()== true){
-        ToFAltTemp = TFminiPlus_getDistance();
-    }
-    else{
+    if (TFminiPlus_GetAvaliable() == true) {
+        ToFAltTemp = TFminiPlus_GetDistance();
+    } else {
         tofaltimeter.lastAlt = -999;
     }
 
@@ -60,22 +58,17 @@ float ToFAltimeterGetVelocity(void) {
     return tofaltimeter.velocity;
 }
 
-static void ToFAltimeterDetectCheck(int32_t ToFAlt)
-{
+static void ToFAltimeterDetectCheck(int32_t ToFAlt) {
     static uint32_t cnt;
     static int32_t lastToFAlt = 0;
 
-    if(ToFAlt == lastToFAlt)
-    {
+    if (ToFAlt == lastToFAlt) {
         cnt++;
-        if(cnt > 100)
-        {
+        if (cnt > 100) {
             //未检测到ToF传感器
             FaultDetectSetError(TOF_UNDETECTED);
         }
-    }
-    else
-    {
+    } else {
         cnt = 0;
         FaultDetectResetError(TOF_UNDETECTED);
     }

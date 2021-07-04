@@ -59,3 +59,9 @@ dkms.conf
 cmake-build-debug/
 cmake-build-minsizerel/
 cmake-build-release/
+
+#CubeMX file
+.cproject
+.mxproject
+.project
+mx.scratch

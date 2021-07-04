@@ -149,7 +149,7 @@ void BaroSensorInit(void) {
 
 void ToFAltitmeterInit(void) {
     if (ToFALTIMETER_TYPE == TFMINIPLUS) {
-        TFminiPlus_init();
+        TFminiPlus_Init();
     }
 }
 
