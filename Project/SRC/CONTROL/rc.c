@@ -49,8 +49,6 @@ static void RcCheckFailsafe(void);
 **********************************************************************************************************/
 void RcInit(void)
 {
-    Sbus_SetRcDataCallback(RcDataUpdate);
-
     //遥控通道数据初始化
     rcData.roll     = 1500;
     rcData.pitch    = 1500;
@@ -393,8 +391,8 @@ static void RcCheckFailsafe(void)
         failsafeStatus[0] = 0;
     }
 
-    //遥控器的失控保护设置为：将辅助通道1的输出变为950
-    if(rcData.aux1 > 920 && rcData.aux1 < 980)
+    //遥控器的失控保护设置为油门小于950
+    if(rcData.throttle < 950)
     {
         if(failsafeCnt > 150)
         {

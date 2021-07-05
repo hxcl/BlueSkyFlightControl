@@ -73,6 +73,9 @@ void Error_Handler(void);
 #define KEY2_Pin GPIO_PIN_0
 #define KEY2_GPIO_Port GPIOC
 #define KEY2_EXTI_IRQn EXTI0_IRQn
+#define Safe_Pin GPIO_PIN_2
+#define Safe_GPIO_Port GPIOC
+#define Safe_EXTI_IRQn EXTI2_IRQn
 #define SPI6_CS_Pin GPIO_PIN_4
 #define SPI6_CS_GPIO_Port GPIOA
 #define LCD_BLK_Pin GPIO_PIN_10

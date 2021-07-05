@@ -35,10 +35,8 @@
 #include "messageQueue.h"
 #include "parameter.h"
 #include "faultDetect.h"
-
 #include "usart.h"
-#include "drv_sbus.h"
-#include "rgb.h"
+#include "motor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -148,8 +146,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_I2C4_Init();
-  MX_UART5_Init();
   /* USER CODE BEGIN 2 */
     xTaskHandle startTask;
 
@@ -315,6 +311,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
     /* User can add his own implementation to report the HAL error return state */
+    MotorStop();
     __disable_irq();
     while (1) {
     }
