@@ -92,7 +92,7 @@ void run_time_task(void *pvParameters)
     {
         memset(RunTimeInfo, 0, 512);
         vTaskGetRunTimeStats(RunTimeInfo);
-        HAL_UART_Transmit(&huart1, "Name\t\tTime\t\t%\r\n",  strlen("任务名\t\t运行时间\t运行所占百分比\r\n"), 100);
+        HAL_UART_Transmit(&huart1, "Name\t\tTime\t\t%\r\n",  strlen("Name\t\tTime\t\t%\r\n"), 100);
         HAL_UART_Transmit(&huart1, RunTimeInfo, 512, 100);
         HAL_UART_Transmit(&huart1, "\r\n",  2, 100);
         vTaskDelay(1000);
@@ -123,7 +123,7 @@ portTASK_FUNCTION(vStartTask, pvParameters) {
 
     MessageQueueCreate();
 
-#ifdef GETRUNTIMESTATS
+#ifdef GET_RUNTIME_STATS
     xTaskCreate(run_time_task,"RunTimeTask",512,NULL,13,& RunTimeStatsTask);
 #endif
 
