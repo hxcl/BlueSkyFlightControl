@@ -37,6 +37,7 @@
 #include "faultDetect.h"
 #include "usart.h"
 #include "motor.h"
+#include "drv_uart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,6 +69,9 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+xTaskHandle RunTimeStatsTask;
+char RunTimeInfo[512];      //保存任务运行时间信息
+char CDC[512];
 
 void TaskStackUseUpdate(void) {
     static int16_t stackUse[10];
@@ -84,17 +88,7 @@ void TaskStackUseUpdate(void) {
     stackUse[9] = stackUse[9];
 }
 
-float CpuUsageUpdate(void) {
-    static float cpuUsage;
-
-    cpuUsage = Get_OSCPUusage();
-
-    return cpuUsage;
-}
-
 portTASK_FUNCTION(vStartTask, pvParameters) {
-    uTaskCPUUsageInit();
-
     BoardInit();
     ParamInit();
     FaultDetectInit();
@@ -111,7 +105,6 @@ portTASK_FUNCTION(vStartTask, pvParameters) {
     //vTaskDelete(NULL);
     for (;;) {
         TaskStackUseUpdate();
-        CpuUsageUpdate();
         vTaskDelay(5000);
     }
 }
@@ -299,6 +292,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
+  if (htim->Instance == TIM7) {
+  }
 
   /* USER CODE END Callback 1 */
 }

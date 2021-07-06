@@ -40,17 +40,6 @@ task.h is included from an application file. */
 #include "timers.h"
 #include "stack_macros.h"
 
-//CPU使用率相关变量定义
-//--------------------------------------------
-#if(configCPU_USAGE_CALCULATE==1)
-static unsigned long max_idle_cnt=0;
-static unsigned short idle_cntl=0;
-static unsigned long idle_cnth=0;
-static unsigned short tick_cnt=0;
-float OSCPUusage=0;
-#endif
-//---------------------------------------------
-
 /* Lint e9021, e961 and e750 are suppressed as a MISRA exception justified
 because the MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined
 for the header files above, but not in this file, in order to generate the
@@ -5222,30 +5211,4 @@ when performing module tests). */
 
 #endif
 
-//空闲任务最大调用次数统计函数-------------------------
-#if( configCPU_USAGE_CALCULATE==1 )
 
-void uTaskCPUUsageInit(void)
-{
-    vTaskDelay(2);//synchronizewithclocktick
-    taskENTER_CRITICAL();
-    max_idle_cnt=0;
-    idle_cntl=0;
-    idle_cnth=0;
-    tick_cnt=0;
-    taskEXIT_CRITICAL();
-
-    //为了防止idle_cnth==configCPU_USAGE_CALC_PERIOD时被清零，所以只统计前80%的时间
-    vTaskDelay(configCPU_USAGE_CALC_PERIOD * 0.8f);//calcmax_idle_cnt
-
-    taskENTER_CRITICAL();
-    max_idle_cnt=idle_cnth / 0.8f;
-    taskEXIT_CRITICAL();
-}
-
-float Get_OSCPUusage(void)
-{
-	return OSCPUusage;
-}
-#endif
-//--------------------------------------------

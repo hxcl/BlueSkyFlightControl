@@ -2411,13 +2411,6 @@ TaskHandle_t pvTaskIncrementMutexHeldCount( void ) PRIVILEGED_FUNCTION;
  */
 void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) PRIVILEGED_FUNCTION;
 
-//--------------------------------------------
-
-#if(configCPU_USAGE_CALCULATE==1)
-float Get_OSCPUusage(void);
-void uTaskCPUUsageInit(void);
-#endif
-//--------------------------------------------
 
 #ifdef __cplusplus
 }

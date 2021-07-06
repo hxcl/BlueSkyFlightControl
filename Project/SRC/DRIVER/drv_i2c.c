@@ -7,6 +7,7 @@
 void I2C_Init() {
     MX_I2C1_Init();
     MX_I2C2_Init();
+    MX_I2C4_Init();
 }
 
 bool I2C_Single_Write(I2C_HandleTypeDef *device, uint8_t SlaveAddress, uint8_t REG_Address, uint8_t REG_data) {

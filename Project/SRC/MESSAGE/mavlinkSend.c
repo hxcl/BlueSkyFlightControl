@@ -128,7 +128,8 @@ void MavlinkSendSysStatus(uint8_t* sendFlag)
     status.onboard_control_sensors_present = 0;
     status.onboard_control_sensors_enabled = 0;
     status.onboard_control_sensors_health  = 0;
-    status.load = Get_OSCPUusage() * 10;
+    //status.load = Get_OSCPUusage() * 10;
+    status.load = 0;
     status.voltage_battery = GetBatteryVoltage() * 10;
     status.current_battery = GetBatteryCurrent() * 10;
     status.battery_remaining = -1;

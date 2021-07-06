@@ -84,7 +84,8 @@ void VelocityEstimate(void)
         nav.velMeasure[1] = gpsVel.y;           //GPS速度y轴
         nav.velMeasure[2] = gpsVel.z;           //GPS速度z轴
         nav.velMeasure[3] = BaroGetVelocity();  //气压速度值
-        nav.velMeasure[4] = ToFAltimeterGetVelocity();                  //TOF速度值
+        nav.velMeasure[4] = 0;
+        // nav.velMeasure[4] = ToFAltimeterGetVelocity();                  //TOF速度值
         nav.velMeasure[5] = 0; 
         
         //GPS已定位且精度高于一定值时才使用GPS速度z轴数据
@@ -94,7 +95,7 @@ void VelocityEstimate(void)
             KalmanVelUseMeasurement(&kalmanVel, GPS_VEL_Z, false);
             
         //禁用TOF速度观测量：尚未装备TOF传感器
-        KalmanVelUseMeasurement(&kalmanVel, TOF_VEL, true);
+        KalmanVelUseMeasurement(&kalmanVel, TOF_VEL, false);
         
         fuseFlag = true;
     }
@@ -146,8 +147,8 @@ void PositionEstimate(void)
             nav.posMeasure.y = 0;
         }
         //使用气压/ToF传感器数据作为高度测量值
-        //nav.posMeasure.z = BaroGetAlt();
-        nav.posMeasure.z = ToFAltimeterGetAlt();
+        nav.posMeasure.z = BaroGetAlt();
+        //nav.posMeasure.z = ToFAltimeterGetAlt();
 
         fuseFlag = true;
     }
@@ -167,6 +168,7 @@ void PositionEstimate(void)
     //位置估计
     KalmanUpdate(&kalmanPos, input, nav.posMeasure, fuseFlag);
     nav.position = kalmanPos.state;
+    nav.position.z = BaroGetAlt();
 }
 
 /**********************************************************************************************************

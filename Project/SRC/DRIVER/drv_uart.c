@@ -85,20 +85,16 @@ void Uart_SetIRQCallback(uint8_t deviceNum, UartCallback uartCallback) {
 **********************************************************************************************************/
 void Uart_SendData(uint8_t deviceNum, uint8_t *DataToSend, uint8_t length) {
     if (deviceNum == 1) {
-        memcpy(&COM1TxBuf, DataToSend, length);
-        HAL_UART_Transmit(&COM1, COM1TxBuf, length, 100);
+        HAL_UART_Transmit_DMA(&COM1, DataToSend, length);
+        //HAL_UART_Transmit(&COM1, DataToSend, length, 100);
     } else if (deviceNum == 2) {
-        memcpy(&COM2TxBuf, DataToSend, length);
-        HAL_UART_Transmit_DMA(&COM2, COM2TxBuf, length);
+        HAL_UART_Transmit_DMA(&COM2, DataToSend, length);
     } else if (deviceNum == 3) {
-        memcpy(&COM3TxBuf, DataToSend, length);
-        HAL_UART_Transmit_DMA(&COM3, COM3TxBuf, length);
+        HAL_UART_Transmit_DMA(&COM3, DataToSend, length);
     } else if (deviceNum == 4) {
-        memcpy(&COM4TxBuf, DataToSend, length);
-        HAL_UART_Transmit_DMA(&COM4, COM4TxBuf, length);
+        HAL_UART_Transmit_DMA(&COM4, DataToSend, length);
     } else if (deviceNum == 5) {
-        memcpy(&COM5TxBuf, DataToSend, length);
-        HAL_UART_Transmit_DMA(&COM5, COM5TxBuf, length);
+        HAL_UART_Transmit_DMA(&COM5, DataToSend, length);
     }
 }
 

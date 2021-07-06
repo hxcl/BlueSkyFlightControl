@@ -118,7 +118,7 @@ static float AltitudeInnerControl(float velZ, float deltaT) {
     static float velLpf;
     float altInnerControlOutput;
     //悬停油门中点
-    int16_t throttleMid = 900;
+    int16_t throttleMid = 200;
 
     /****************************************************************************************
         目前高度控制由高度环P控制以及速度环PID控制串联而成

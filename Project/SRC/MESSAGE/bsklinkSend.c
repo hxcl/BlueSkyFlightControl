@@ -940,7 +940,7 @@ void BsklinkSendUserDefine(uint8_t* sendFlag)
     payload.data1   = TFminiPlus_GetDistance();
     payload.data2   = TFminiPlus_GetSignalStrength()/100;
     payload.data3   = TFminiPlus_GetAvaliable();
-    payload.data4   = Get_OSCPUusage()*1000;
+    payload.data4   = 4;
     payload.data5   = 5;
     payload.data6   = 6;
     payload.data7   = 7;
