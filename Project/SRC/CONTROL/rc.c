@@ -477,7 +477,7 @@ void FlightStatusUpdate(void)
         //判断垂直速度大于一定值则进入空中状态
         //后面有时间再慢慢优化起飞步骤，把起飞操作变成一个半自动过程，改善飞行体验
         //因为对于一个完全没有接触过飞机的人来说，手动起飞可能会出现各种意外（比如摇杆往上拨了一点点就立马收油）
-        if(GetCopterVelocity().z > 2)
+        if(GetCopterVelocity().z > 5)
             SetFlightStatus(IN_AIR);
         else if(rcData.throttle < MINCHECK)
             SetFlightStatus(STANDBY);

@@ -71,8 +71,6 @@ static void SendListCreate(uint8_t* sendFreq, uint8_t* sortResult, uint8_t* send
 **********************************************************************************************************/
 void MessageInit(void)
 {
-    Uart_SetIRQCallback(DATA_UART, MessageProtocolTypeDetect);
-
     /*初始化各帧的发送频率，各帧频率和不能超过MAX_SEND_FREQ*/
     //bsklink发送频率
     bsklinkSendFreq[BSKLINK_MSG_ID_FLIGHT_DATA]        = 10;
@@ -213,8 +211,6 @@ static void MessageProtocolTypeDetect(uint8_t data)
     {
         //设置协议类型为bsklink
         messageType = BSKLINK;
-
-        Uart_SetIRQCallback(DATA_UART, BsklinkDecode);
     }
 
     //检测mavlink协议
@@ -222,8 +218,6 @@ static void MessageProtocolTypeDetect(uint8_t data)
     {
         //设置协议类型为mavlink
         messageType = MAVLINK;
-
-        Uart_SetIRQCallback(DATA_UART, MavlinkDecode);
     }
 }
 

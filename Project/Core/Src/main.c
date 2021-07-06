@@ -38,6 +38,7 @@
 #include "usart.h"
 #include "motor.h"
 #include "drv_uart.h"
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,9 +70,36 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+#ifdef GET_RUNTIME_STATS
 xTaskHandle RunTimeStatsTask;
-char RunTimeInfo[512];      //保存任务运行时间信息
-char CDC[512];
+unsigned long timer_counter;
+char RunTimeInfo[512];
+
+void configureTimerForRunTimeStats(void){
+    MX_TIM7_Init();
+    timer_counter = 0;
+    HAL_TIM_Base_Start_IT(&htim7);
+}
+unsigned long getRunTimeCounterValue(void)
+{
+    return timer_counter;
+}
+
+void run_time_task(void *pvParameters)
+{
+    for (;;)
+    {
+        memset(RunTimeInfo, 0, 512);
+        vTaskGetRunTimeStats(RunTimeInfo);
+        HAL_UART_Transmit(&huart1, "Name\t\tTime\t\t%\r\n",  strlen("任务名\t\t运行时间\t运行所占百分比\r\n"), 100);
+        HAL_UART_Transmit(&huart1, RunTimeInfo, 512, 100);
+        HAL_UART_Transmit(&huart1, "\r\n",  2, 100);
+        vTaskDelay(1000);
+    }
+}
+
+#endif
 
 void TaskStackUseUpdate(void) {
     static int16_t stackUse[10];
@@ -94,6 +122,10 @@ portTASK_FUNCTION(vStartTask, pvParameters) {
     FaultDetectInit();
 
     MessageQueueCreate();
+
+#ifdef GETRUNTIMESTATS
+    xTaskCreate(run_time_task,"RunTimeTask",512,NULL,13,& RunTimeStatsTask);
+#endif
 
     ModuleTaskCreate();
     SensorTaskCreate();
@@ -265,12 +297,8 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     if (GPIO_Pin == GPIO_PIN_0) {
-        // Toglle blue led
-        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_4);
     }
     if (GPIO_Pin == GPIO_PIN_13) {
-        // Toglle green led
-        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
     }
 }
 /* USER CODE END 4 */
@@ -293,6 +321,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   /* USER CODE BEGIN Callback 1 */
   if (htim->Instance == TIM7) {
+      timer_counter++;
   }
 
   /* USER CODE END Callback 1 */

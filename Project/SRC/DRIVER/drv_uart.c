@@ -51,32 +51,6 @@ void Uart_Init() {
     HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
 }
 
-static UartCallback uart1CallbackFunc;
-static UartCallback uart2CallbackFunc;
-static UartCallback uart3CallbackFunc;
-static UartCallback uart4CallbackFunc;
-static UartCallback uart5CallbackFunc;
-
-/**********************************************************************************************************
-*函 数 名: Usart_SetIRQCallback
-*功能说明: 设置串口接收中断回调函数
-*形    参: 串口号 回调函数
-*返 回 值: 无
-**********************************************************************************************************/
-void Uart_SetIRQCallback(uint8_t deviceNum, UartCallback uartCallback) {
-    if (deviceNum == 1) {
-        uart1CallbackFunc = uartCallback;
-    } else if (deviceNum == 2) {
-        uart2CallbackFunc = uartCallback;
-    } else if (deviceNum == 3) {
-        uart3CallbackFunc = uartCallback;
-    } else if (deviceNum == 4) {
-        uart4CallbackFunc = uartCallback;
-    } else if (deviceNum == 5) {
-        uart5CallbackFunc = uartCallback;
-    }
-}
-
 /**********************************************************************************************************
 *函 数 名: Uart_SendData
 *功能说明: 串口数据发送函数

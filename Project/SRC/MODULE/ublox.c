@@ -45,9 +45,6 @@ void Ublox_Init(void)
         230400
     };
 
-    //设置GPS串口接收中断回调函数（即数据协议解析函数）
-    Uart_SetIRQCallback(GPS_UART, Ublox_Decode);
-
     //搜寻ublox串口波特率
     for(uint8_t i=0; i<5; i++)
     {
