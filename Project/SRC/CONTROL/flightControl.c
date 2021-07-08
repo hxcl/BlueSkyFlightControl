@@ -116,9 +116,9 @@ void SetAttInnerCtlTarget(Vector3f_t target) {
 **********************************************************************************************************/
 static float AltitudeInnerControl(float velZ, float deltaT) {
     static float velLpf;
-    float altInnerControlOutput;
+    static float altInnerControlOutput;
     //悬停油门中点
-    int16_t throttleMid = 0;
+    int16_t throttleMid = 600;
 
     /****************************************************************************************
         目前高度控制由高度环P控制以及速度环PID控制串联而成
@@ -138,8 +138,7 @@ static float AltitudeInnerControl(float velZ, float deltaT) {
     fc.posInnerError.z = fc.posInnerTarget.z - velLpf;
 
     //PID算法，计算出高度内环（Z轴速度）的控制量
-    altInnerControlOutput = PID_GetPI(&fc.pid[VEL_Z], fc.posInnerError.z, deltaT);
-    altInnerControlOutput += PID_GetD(&fc.pid[VEL_Z], fc.posInnerError.z, deltaT);
+    altInnerControlOutput = PID_GetPID(&fc.pid[VEL_Z], fc.posInnerError.z, deltaT);
 
     //在PID控制量上加入油门前馈补偿
     altInnerControlOutput += throttleMid;

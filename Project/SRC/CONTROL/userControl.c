@@ -17,9 +17,9 @@
 #include "navigation.h"
 #include "board.h"
 
-#define ALT_SPEED_UP_MAX	500	    //最大上升速度：5m/s
-#define ALT_SPEED_DOWN_MAX	300     //最大下降速度：3m/s
-#define HORIZON_SPEED_MAX	800     //最大水平飞行速度：8m/s
+#define ALT_SPEED_UP_MAX	100	    //最大上升速度：1m/s
+#define ALT_SPEED_DOWN_MAX	100     //最大下降速度：1m/s
+#define HORIZON_SPEED_MAX	100     //最大水平飞行速度：1m/s
 
 static Vector3f_t posCtlTarget;
 static float yawHold;
@@ -50,6 +50,9 @@ void UserControl(void)
 
     //获取摇杆数据
     rcCommand = GetRcCommad();
+
+    rcCommand.roll  = ApplyDeadbandInt(rcCommand.roll, 100);
+    rcCommand.pitch = ApplyDeadbandInt(rcCommand.pitch, 100);
 
     //通用控制部分，将摇杆量转换为横滚俯仰的目标控制角度
     rcTarget.roll  = rcCommand.roll  * rollRate;

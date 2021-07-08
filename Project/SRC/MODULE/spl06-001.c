@@ -396,8 +396,7 @@ void spl0601_update(void) {
 
     Tempbaro = (float) (p_spl0601->Pressure / 101325.0f);
     BaroAlt = 4433000.0f * (1 - powf((float) (Tempbaro), 0.190295f));
-    // centimeter
-    spl0601.BaroAlt = BaroAlt*100;
+    spl0601.BaroAlt = BaroAlt;
 }
 
 void spl0601_ReadAlt(int32_t *baroAlt) {
