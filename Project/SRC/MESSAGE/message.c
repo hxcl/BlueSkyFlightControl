@@ -41,18 +41,20 @@ http://mavlink.org/messages/common
 https://mavlink.io/en/messages/common.html
 */
 
+#ifdef ENABLE_MAVLINK
 //mavlink的心跳包ID为0，无法参与发送列表排序，故为其重新定义一个ID（仅用于参与排序）
 #define MAVLINK_MSG_ID_HEARTBEAT2   180
-
-uint8_t bsklinkSendFlag[0xFF];	            //发送标志位
-uint8_t bsklinkSendFreq[0xFF];	            //发送频率
-uint8_t bsklinkSortResult[0xFF];            //发送频率排序
-uint8_t bsklinkSendList[MAX_SEND_FREQ];     //发送列表
 
 uint8_t mavlinkSendFlag[0xFF];	            //发送标志位
 uint8_t mavlinkSendFreq[0xFF];	            //发送频率
 uint8_t mavlinkSortResult[0xFF];            //发送频率排序
 uint8_t mavlinkSendList[MAX_SEND_FREQ];     //发送列表
+#endif
+
+uint8_t bsklinkSendFlag[0xFF];	            //发送标志位
+uint8_t bsklinkSendFreq[0xFF];	            //发送频率
+uint8_t bsklinkSortResult[0xFF];            //发送频率排序
+uint8_t bsklinkSendList[MAX_SEND_FREQ];     //发送列表
 
 //定义通信协议类型，根据接收到的数据帧进行自动检测
 enum MESSAGE_TYPE messageType = BSKLINK;
@@ -88,6 +90,11 @@ void MessageInit(void)
     bsklinkSendFreq[BSKLINK_MSG_ID_SYS_ERROR]          = 1;     //固定1Hz
     bsklinkSendFreq[BSKLINK_MSG_ID_SYS_WARNING]        = 1;     //固定1Hz
     bsklinkSendFreq[BSKLINK_MSG_ID_HEARTBEAT]          = 1;     //心跳包发送频率为固定1Hz
+    //生成bsklink发送列表
+    SendFreqSort(bsklinkSortResult, bsklinkSendFreq);
+    SendListCreate(bsklinkSendFreq, bsklinkSortResult, bsklinkSendList);
+
+#ifdef ENABLE_MAVLINK
     //mavlink发送频率
     mavlinkSendFreq[MAVLINK_MSG_ID_SYS_STATUS]         = 1;
     mavlinkSendFreq[MAVLINK_MSG_ID_GPS_RAW_INT]        = 1;
@@ -98,15 +105,11 @@ void MessageInit(void)
     mavlinkSendFreq[MAVLINK_MSG_ID_HOME_POSITION]      = 1;
     mavlinkSendFreq[MAVLINK_MSG_ID_VFR_HUD]            = 10;
     mavlinkSendFreq[MAVLINK_MSG_ID_HEARTBEAT2]         = 1;     //心跳包发送频率为固定1Hz
-
-    //生成bsklink发送列表
-    SendFreqSort(bsklinkSortResult, bsklinkSendFreq);
-    SendListCreate(bsklinkSendFreq, bsklinkSortResult, bsklinkSendList);
     //生成mavlink发送列表
     SendFreqSort(mavlinkSortResult, mavlinkSendFreq);
     SendListCreate(mavlinkSendFreq, mavlinkSortResult, mavlinkSendList);
-
     MavParamSetDefault();
+#endif
 }
 
 /**********************************************************************************************************
@@ -154,6 +157,8 @@ void MessageSendLoop(void)
             BsklinkSendHeartBeat(&bsklinkSendFlag[BSKLINK_MSG_ID_HEARTBEAT]);              //心跳包
         }
     }
+
+#ifdef ENABLE_MAVLINK
     /*mavlink发送循环*/
     else if(messageType == MAVLINK)
     {
@@ -192,6 +197,7 @@ void MessageSendLoop(void)
             MavlinkSendHeartbeat(&mavlinkSendFlag[MAVLINK_MSG_ID_HEARTBEAT2]);                 //心跳包
         }
     }
+#endif
 }
 
 /**********************************************************************************************************
@@ -212,13 +218,14 @@ static void MessageProtocolTypeDetect(uint8_t data)
         //设置协议类型为bsklink
         messageType = BSKLINK;
     }
-
+#ifdef ENABLE_MAVLINK
     //检测mavlink协议
     if(mavlink_parse_char(0, data, &mavMsg, &mavStatus) == true)
     {
         //设置协议类型为mavlink
         messageType = MAVLINK;
     }
+#endif
 }
 
 /**********************************************************************************************************
@@ -255,7 +262,9 @@ void BsklinkSendEnable(uint8_t msgid)
 **********************************************************************************************************/
 void MavlinkSendEnable(uint8_t msgid)
 {
+#ifdef ENABLE_MAVLINK
     mavlinkSendFlag[msgid] = ENABLE;
+#endif
 }
 
 /**********************************************************************************************************
