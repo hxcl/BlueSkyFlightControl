@@ -365,6 +365,9 @@ static void AltControl(RCCOMMAND_t rcCommand)
 
     if (abs(rcCommand.throttle) > rcDeadband)
     {
+        // 高度改变过程中 E3 灯灭
+        HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, 1);
+
         rcCommand.throttle = ApplyDeadbandInt((rcCommand.throttle), rcDeadband);
 
         //摇杆量转为目标速度，低通滤波改变操控手感
@@ -423,6 +426,9 @@ static void AltControl(RCCOMMAND_t rcCommand)
         {
             posCtlTarget.z = GetCopterPosition().z;
         }
+
+        // 定高过程中 E3 灯亮
+        HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3, 0);
 
         //使能高度控制
         SetAltCtlStatus(ENABLE);
