@@ -75,7 +75,7 @@ void MessageInit(void)
 {
     /*初始化各帧的发送频率，各帧频率和不能超过MAX_SEND_FREQ*/
     //bsklink发送频率
-    bsklinkSendFreq[BSKLINK_MSG_ID_FLIGHT_DATA]        = 10;
+    bsklinkSendFreq[BSKLINK_MSG_ID_FLIGHT_DATA]        = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_FLIGHT_STATUS]      = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_SENSOR]             = 3;
     bsklinkSendFreq[BSKLINK_MSG_ID_SENSOR_CALI_DATA]   = 1;
@@ -83,10 +83,10 @@ void MessageInit(void)
     bsklinkSendFreq[BSKLINK_MSG_ID_MOTOR]              = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_GPS]                = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_BATTERY]            = 1;
-    bsklinkSendFreq[BSKLINK_MSG_ID_ATT_ANALYSE]        = 30;
+    bsklinkSendFreq[BSKLINK_MSG_ID_ATT_ANALYSE]        = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_VEL_ANALYSE]        = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_POS_ANALYSE]        = 1;
-    bsklinkSendFreq[BSKLINK_MSG_ID_USER_DEFINE]        = 10;
+    bsklinkSendFreq[BSKLINK_MSG_ID_USER_DEFINE]        = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_SYS_ERROR]          = 1;     //固定1Hz
     bsklinkSendFreq[BSKLINK_MSG_ID_SYS_WARNING]        = 1;     //固定1Hz
     bsklinkSendFreq[BSKLINK_MSG_ID_HEARTBEAT]          = 1;     //心跳包发送频率为固定1Hz

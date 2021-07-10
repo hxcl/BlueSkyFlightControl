@@ -115,8 +115,11 @@ portTASK_FUNCTION(vSensorUpdateTask, pvParameters)
         }
 
         //电池电压电流采样更新 200Hz
-        BatteryVoltageUpdate();
-        BatteryCurrentUpdate();
+        if(count % 20 == 0)
+        {
+            BatteryVoltageUpdate();
+            BatteryCurrentUpdate();
+        }
 
         //RGB闪烁
         RGB_Flash();

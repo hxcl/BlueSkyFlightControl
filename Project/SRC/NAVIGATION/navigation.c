@@ -50,65 +50,69 @@ void NavigationInit(void)
 **********************************************************************************************************/
 void VelocityEstimate(void)
 {
-    static uint64_t previousT;
-    float deltaT;
-    Vector3f_t gpsVel;
-    static uint32_t count;
-    static bool fuseFlag;
-        
-    //计算时间间隔，用于积分
-    deltaT = (GetSysTimeUs() - previousT) * 1e-6;
-    deltaT = ConstrainFloat(deltaT, 0.0005, 0.005);
-    previousT = GetSysTimeUs();
+//    static uint64_t previousT;
+//    float deltaT;
+//    Vector3f_t gpsVel;
+//    static uint32_t count;
+//    static bool fuseFlag;
+//
+//    //计算时间间隔，用于积分
+//    deltaT = (GetSysTimeUs() - previousT) * 1e-6;
+//    deltaT = ConstrainFloat(deltaT, 0.0005, 0.005);
+//    previousT = GetSysTimeUs();
+//
+//    //获取运动加速度
+//    nav.accel = GetCopterAccEf();
+//
+//    //加速度数据更新频率1KHz，而气压数据更新频率只有25Hz，GPS数据只有10Hz
+//    //这里将气压与GPS参与融合的频率强制统一为25Hz
+//    if(count++ % 40 == 0)
+//    {
+//        if(GpsGetFixStatus())
+//        {
+//            //获取GPS速度测量值，转换速度值到机体坐标系
+//            TransVelToBodyFrame(GpsGetVelocity(), &gpsVel, GetCopterAngle().z);
+//        }
+//        else
+//        {
+//            gpsVel.x = 0;
+//            gpsVel.y = 0;
+//            gpsVel.z = 0;
+//        }
+//
+//        nav.velMeasure[0] = gpsVel.x;           //GPS速度x轴
+//        nav.velMeasure[1] = gpsVel.y;           //GPS速度y轴
+//        nav.velMeasure[2] = gpsVel.z;           //GPS速度z轴
+//        nav.velMeasure[3] = BaroGetVelocity();  //气压速度值
+//        nav.velMeasure[4] = 0;
+//        nav.velMeasure[4] = ToFAltimeterGetVelocity();                  //TOF速度值
+//        nav.velMeasure[5] = 0;
+//
+//        //GPS已定位且精度高于一定值时才使用GPS速度z轴数据
+//        if(GpsGetFixStatus() && (GpsGetAccuracy() < 1.5f))
+//            KalmanVelUseMeasurement(&kalmanVel, GPS_VEL_Z, true);
+//        else if((!GpsGetFixStatus()) || (GpsGetAccuracy() > 2.0f))
+//            KalmanVelUseMeasurement(&kalmanVel, GPS_VEL_Z, false);
+//
+//        //禁用TOF速度观测量：尚未装备TOF传感器
+//        KalmanVelUseMeasurement(&kalmanVel, TOF_VEL, true);
+//
+//        fuseFlag = true;
+//    }
+//    else
+//    {
+//        fuseFlag = false;
+//    }
+//
+//    /*
+//    更新卡尔曼滤波器
+//    估计飞行速度及加速度bias
+//    */
+//    KalmanVelUpdate(&kalmanVel, &nav.velocity, &nav.accel_bias, nav.accel, nav.velMeasure, deltaT, fuseFlag);
 
-    //获取运动加速度
-    nav.accel = GetCopterAccEf();
-
-    //加速度数据更新频率1KHz，而气压数据更新频率只有25Hz，GPS数据只有10Hz
-    //这里将气压与GPS参与融合的频率强制统一为25Hz
-    if(count++ % 40 == 0)
-    {
-        if(GpsGetFixStatus())
-        {
-            //获取GPS速度测量值，转换速度值到机体坐标系
-            TransVelToBodyFrame(GpsGetVelocity(), &gpsVel, GetCopterAngle().z);
-        }
-        else
-        {
-            gpsVel.x = 0;
-            gpsVel.y = 0;
-            gpsVel.z = 0;
-        }
-
-        nav.velMeasure[0] = gpsVel.x;           //GPS速度x轴
-        nav.velMeasure[1] = gpsVel.y;           //GPS速度y轴
-        nav.velMeasure[2] = gpsVel.z;           //GPS速度z轴
-        nav.velMeasure[3] = BaroGetVelocity();  //气压速度值
-        nav.velMeasure[4] = 0;
-        // nav.velMeasure[4] = ToFAltimeterGetVelocity();                  //TOF速度值
-        nav.velMeasure[5] = 0; 
-        
-        //GPS已定位且精度高于一定值时才使用GPS速度z轴数据
-        if(GpsGetFixStatus() && (GpsGetAccuracy() < 1.5f))
-            KalmanVelUseMeasurement(&kalmanVel, GPS_VEL_Z, true);
-        else if((!GpsGetFixStatus()) || (GpsGetAccuracy() > 2.0f))
-            KalmanVelUseMeasurement(&kalmanVel, GPS_VEL_Z, false);
-            
-        //禁用TOF速度观测量：尚未装备TOF传感器
-        KalmanVelUseMeasurement(&kalmanVel, TOF_VEL, false);
-        
-        fuseFlag = true;
-    }
-    else
-    {
-        fuseFlag = false;
-    }
-    
-    /*
-    更新卡尔曼滤波器
-    估计飞行速度及加速度bias
-    */
-    KalmanVelUpdate(&kalmanVel, &nav.velocity, &nav.accel_bias, nav.accel, nav.velMeasure, deltaT, fuseFlag);
+    nav.velocity.x = 0;
+    nav.velocity.y = 0;
+    nav.velocity.z = ToFAltimeterGetVelocity();
 }
 
 /**********************************************************************************************************
@@ -120,55 +124,57 @@ void VelocityEstimate(void)
 **********************************************************************************************************/
 void PositionEstimate(void)
 {
-    static uint64_t previousT;
-    float deltaT;
-    Vector3f_t velocityEf;
-    Vector3f_t input;
-    static uint32_t count;
-    static bool fuseFlag;
-
-    //计算时间间隔，用于积分
-    deltaT = (GetSysTimeUs() - previousT) * 1e-6;
-    deltaT = ConstrainFloat(deltaT, 0.0005, 0.002);
-    previousT = GetSysTimeUs();
-
-    //速度数据更新频率1KHz，而气压数据更新频率只有25Hz，GPS数据只有10Hz
-    //这里将气压与GPS参与融合的频率强制统一为25Hz
-    if(count++ % 40 == 0)
-    {
-        if(GpsGetFixStatus())
-        {
-            //获取GPS位置
-            nav.posMeasure = GpsGetPosition();
-        }
-        else
-        {
-            nav.posMeasure.x = 0;
-            nav.posMeasure.y = 0;
-        }
-        //使用气压/ToF传感器数据作为高度测量值
-        nav.posMeasure.z = BaroGetAlt();
-        //nav.posMeasure.z = ToFAltimeterGetAlt();
-
-        fuseFlag = true;
-    }
-    else
-    {
-        fuseFlag = false;
-    }
-
-    //转换速度值到导航系
-    TransVelToEarthFrame(nav.velocity, &velocityEf, GetCopterAngle().z);
-
-    //速度积分
-    input.x = velocityEf.x * deltaT;
-    input.y = velocityEf.y * deltaT;
-    input.z = velocityEf.z * deltaT;
-
-    //位置估计
-    KalmanUpdate(&kalmanPos, input, nav.posMeasure, fuseFlag);
-    nav.position = kalmanPos.state;
-    nav.position.z = BaroGetAlt();
+//    static uint64_t previousT;
+//    float deltaT;
+//    Vector3f_t velocityEf;
+//    Vector3f_t input;
+//    static uint32_t count;
+//    static bool fuseFlag;
+//
+//    //计算时间间隔，用于积分
+//    deltaT = (GetSysTimeUs() - previousT) * 1e-6;
+//    deltaT = ConstrainFloat(deltaT, 0.0005, 0.002);
+//    previousT = GetSysTimeUs();
+//
+//    //速度数据更新频率1KHz，而气压数据更新频率只有25Hz，GPS数据只有10Hz
+//    //这里将气压与GPS参与融合的频率强制统一为25Hz
+//    if(count++ % 40 == 0)
+//    {
+//        if(GpsGetFixStatus())
+//        {
+//            //获取GPS位置
+//            nav.posMeasure = GpsGetPosition();
+//        }
+//        else
+//        {
+//            nav.posMeasure.x = 0;
+//            nav.posMeasure.y = 0;
+//        }
+//        //使用气压/ToF传感器数据作为高度测量值
+//        nav.posMeasure.z = BaroGetAlt();
+//        //nav.posMeasure.z = ToFAltimeterGetAlt();
+//
+//        fuseFlag = true;
+//    }
+//    else
+//    {
+//        fuseFlag = false;
+//    }
+//
+//    //转换速度值到导航系
+//    TransVelToEarthFrame(nav.velocity, &velocityEf, GetCopterAngle().z);
+//
+//    //速度积分
+//    input.x = velocityEf.x * deltaT;
+//    input.y = velocityEf.y * deltaT;
+//    input.z = velocityEf.z * deltaT;
+//
+//    //位置估计
+//    KalmanUpdate(&kalmanPos, input, nav.posMeasure, fuseFlag);
+//    nav.position = kalmanPos.state;
+    nav.position.x = 0;
+    nav.position.y = 0;
+    nav.position.z = ToFAltimeterGetAlt();
 }
 
 /**********************************************************************************************************

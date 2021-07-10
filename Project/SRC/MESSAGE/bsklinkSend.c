@@ -9,6 +9,7 @@
  * @网站     bbs.loveuav.com
  * @日期     2018.07
 **********************************************************************************************************/
+#include <ToF_altimeter.h>
 #include "bsklinkSend.h"
 #include "message.h"
 #include "bsklink.h"
@@ -832,10 +833,10 @@ void BsklinkSendVelAnalyse(uint8_t* sendFlag)
     payload.gpsVel.x      = GetCopterVelMeasure()[GPS_VEL_X];             //GPS速度 单位：cm/s
     payload.gpsVel.y      = GetCopterVelMeasure()[GPS_VEL_Y];
     payload.gpsVel.z      = GetCopterVelMeasure()[GPS_VEL_Z];
-    payload.opticalVelX   = GetAccelBias().x * 10;                        //光流速度 单位：cm/s
-    payload.opticalVelY   = GetAccelBias().y * 10;
-    payload.baroVel       = GetCopterVelMeasure()[BARO_VEL];
-    payload.tofVel        = GetAccelBias().z * 10;
+    payload.opticalVelX   = 0;                                            //光流速度 单位：cm/s
+    payload.opticalVelY   = 0;
+    payload.baroVel       = BaroGetVelocity();
+    payload.tofVel        = ToFAltimeterGetVelocity();
     payload.velEstError.x = 0;                                            //速度估计误差 单位：cm/s
     payload.velEstError.y = 0;
     payload.velEstError.z = 0;
@@ -883,7 +884,7 @@ void BsklinkSendPosAnalyse(uint8_t* sendFlag)
     payload.position.x    = GetCopterPosition().x;               //位置估计值 单位：cm
     payload.position.y    = GetCopterPosition().y;
     payload.position.z    = GetCopterPosition().z;
-    payload.posTarget.x   =  GetPosOuterCtlTarget().x;           //位置目标 单位：cm
+    payload.posTarget.x   = GetPosOuterCtlTarget().x;           //位置目标 单位：cm
     payload.posTarget.y   = GetPosOuterCtlTarget().y;
     payload.posTarget.z   = GetPosOuterCtlTarget().z;
     payload.gpsPos.x      = GetCopterPosMeasure().x;             //GPS位置 单位：cm
@@ -892,7 +893,7 @@ void BsklinkSendPosAnalyse(uint8_t* sendFlag)
     payload.opticalPosX   = 0;                                   //光流位置 单位：cm
     payload.opticalPosY   = 0;
     payload.baroAlt       = GetCopterPosMeasure().z;             //气压高度 单位：cm
-    payload.tofAlt        = 0;                                   //TOF高度 单位：cm
+    payload.tofAlt        = ToFAltimeterGetAlt();                //TOF高度 单位：cm
     payload.posEstError.x = 0;                                   //高度估计误差 单位：cm
     payload.posEstError.y = 0;
     payload.posEstError.z = 0;
@@ -939,7 +940,7 @@ void BsklinkSendUserDefine(uint8_t* sendFlag)
     //数据负载填充
     payload.data1   = TFminiPlus_GetDistance();
     payload.data2   = TFminiPlus_GetSignalStrength()/100;
-    payload.data3   = TFminiPlus_GetAvaliable();
+    payload.data3   = 3;
     payload.data4   = 4;
     payload.data5   = 5;
     payload.data6   = 6;

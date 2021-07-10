@@ -28,23 +28,19 @@ void ToFAltimeterDataTreat(void) {
     float deltaT = (GetSysTimeUs() - lastTime) * 1e-6;
     lastTime = GetSysTimeUs();
 
-    if (TFminiPlus_GetAvaliable() == true) {
-        ToFAltTemp = TFminiPlus_GetDistance();
-    } else {
-        tofaltimeter.lastAlt = -999;
-    }
+    ToFAltTemp = TFminiPlus_GetDistance();
 
     // 是否需要角度补偿？
+    // 若姿态角限制在 10° 以内，误差不超过 2%
 
     // 高度低通滤波
-    //tofaltimeter.alt = tofaltimeter.alt * 0.1f + baroAltTemp * 0.9f;
     // 激光测距是否准到能直接使用作为高度？
     tofaltimeter.alt = ToFAltTemp;
 
     // 计算速度，并进行低通滤波
-    //tofaltimeter.velocity = tofaltimeter.velocity * 0.2f + ((tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT) * 0.8f;
     // 激光测距是否准到能直接使用差分值作为速度？
-    tofaltimeter.velocity = (tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT * 0.35f;
+    tofaltimeter.velocity = tofaltimeter.velocity * 0.1f + ((tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT) * 0.9f;
+    //tofaltimeter.velocity = (tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT;
     tofaltimeter.lastAlt = tofaltimeter.alt;
 
     ToFAltimeterDetectCheck(tofaltimeter.lastAlt);
