@@ -37,10 +37,8 @@ void ToFAltimeterDataTreat(void) {
     // 激光测距是否准到能直接使用作为高度？
     tofaltimeter.alt = ToFAltTemp;
 
-    // 计算速度，并进行低通滤波
-    // 激光测距是否准到能直接使用差分值作为速度？
-    tofaltimeter.velocity = tofaltimeter.velocity * 0.1f + ((tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT) * 0.9f;
-    //tofaltimeter.velocity = (tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT;
+    // 速度低通滤波
+    tofaltimeter.velocity = tofaltimeter.velocity * 0.65f + ((tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT) * 0.35f;
     tofaltimeter.lastAlt = tofaltimeter.alt;
 
     ToFAltimeterDetectCheck(tofaltimeter.lastAlt);

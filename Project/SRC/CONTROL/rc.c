@@ -137,9 +137,9 @@ static void RcCommandUpdate(void)
     }
     else
     {
-        rcCommand.roll     = 0;
-        rcCommand.pitch    = 0;
-        rcCommand.yaw      = 0;
+        rcCommand.roll     = rcData.roll - 1500;
+        rcCommand.pitch    = rcData.pitch - 1500;
+        rcCommand.yaw      = rcData.yaw - 1500;
         rcCommand.throttle = (rcData.throttle - 1000) * 2;
     }
 }
