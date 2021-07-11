@@ -25,7 +25,7 @@
 **********************************************************************************************************/
 #define GYRO_ROTATION       ROTATION_ROLL_180_YAW_270
 #define ACC_ROTATION        ROTATION_ROLL_180_YAW_270
-#define MAG_ROTATION        ROTATION_ROLL_180_YAW_270
+#define MAG_ROTATION        ROTATION_YAW_180
 
 /**********************************************************************************************************
 *传感器配置
@@ -35,7 +35,7 @@
 #define BARO_COMMUNICATE_TYPE   BARO_I2C    //气压计通信接口
 #define MAG_TYPE             IST8310        //罗盘型号
 #define ToFALTIMETER_TYPE    TFMINIPLUS
-#define OPTFLOW_TYPE         LC302
+#define OPTFLOW_TYPE         PX4FLOW
 
 #define configUSE_SENSORHEAT 0              //是否使用传感器恒温
 
@@ -46,6 +46,8 @@
 #define BARO_I2C             hi2c1              //气压计I2C配置
 
 #define MAG_I2C              hi2c2              //磁力计I2C配置
+
+#define PX4FLOW_I2C          hi2c4          //PX4FLOW I2C配置
 
 #define GPS_UART             3              //GPS串口配置
 #define GPS_BAUDRATE         0              //波特率默认115200，可自动识别并对gps模块进行配置
@@ -154,139 +156,6 @@
 //#define SOFT_I2C2_PIN_SCL       GPIO_Pin_7
 //#define SOFT_I2C2_PIN_SDA       GPIO_Pin_7
 //#define SOFT_I2C2_DELAY         0
-
-/**********************************************************************************************************
-*定时器引脚及参数配置
-**********************************************************************************************************/
-#define TIM1_CLOCK                    PPM_TIM_FREQ
-#define TIM1_PERIOD                   PPM_TIM_PERIOD
-#define TIM1_IRQ_PRIORITY              3
-#define TIM1_PWM_OUT                  0
-#define TIM1_PPM_IN                   1
-#if(configUSE_TIM1_CH1 == 1)
-#define TIM1_CH1_GPIO             PPM_GPIO
-#define TIM1_CH1_PIN              PPM_PIN
-#define TIM1_CH1_PINSOURCE        PPM_PINSOURCE
-#endif
-#if(configUSE_TIM1_CH2 == 1)
-#define TIM1_CH2_GPIO             GPIOA
-#define TIM1_CH2_PIN              GPIO_Pin_7
-#define TIM1_CH2_PINSOURCE        GPIO_PinSource5
-#endif
-#if(configUSE_TIM1_CH3 == 1)
-#define TIM1_CH3_GPIO             GPIOA
-#define TIM1_CH3_PIN              GPIO_Pin_7
-#define TIM1_CH3_PINSOURCE        GPIO_PinSource5
-#endif
-#if(configUSE_TIM1_CH4 == 1)
-#define TIM1_CH4_GPIO             GPIOA
-#define TIM1_CH4_PIN              GPIO_Pin_7
-#define TIM1_CH4_PINSOURCE        GPIO_PinSource5
-#endif
-
-#define TIM2_CLOCK                    PWM_TIM_FREQ
-#define TIM2_PERIOD                   PWM_TIM_PERIOD
-#define TIM2_IRQ_PRIORITY              3
-#define TIM2_PWM_OUT                  1
-#define TIM2_PPM_IN                   0
-#if(configUSE_TIM2_CH1 == 1)
-#define TIM2_CH1_GPIO             GPIOA
-#define TIM2_CH1_PIN              GPIO_Pin_15
-#define TIM2_CH1_PINSOURCE        GPIO_PinSource15
-#endif
-#if(configUSE_TIM2_CH2 == 1)
-#define TIM2_CH2_GPIO             GPIOB
-#define TIM2_CH2_PIN              GPIO_Pin_3
-#define TIM2_CH2_PINSOURCE        GPIO_PinSource3
-#endif
-#if(configUSE_TIM2_CH3 == 1)
-#define TIM2_CH3_GPIO             GPIOA
-#define TIM2_CH3_PIN              GPIO_Pin_2
-#define TIM2_CH3_PINSOURCE        GPIO_PinSource2
-#endif
-#if(configUSE_TIM2_CH4 == 1)
-#define TIM2_CH4_GPIO             GPIOA
-#define TIM2_CH4_PIN              GPIO_Pin_3
-#define TIM2_CH4_PINSOURCE        GPIO_PinSource3
-#endif
-
-#define TIM3_CLOCK                    PWM_TIM_FREQ
-#define TIM3_PERIOD                   PWM_TIM_PERIOD
-#define TIM3_IRQ_PRIORITY              3
-#define TIM3_PWM_OUT                  1
-#define TIM3_PPM_IN                   0
-#if(configUSE_TIM3_CH1 == 1)
-#define TIM3_CH1_GPIO             GPIOB
-#define TIM3_CH1_PIN              GPIO_Pin_4
-#define TIM3_CH1_PINSOURCE        GPIO_PinSource4
-#endif
-#if(configUSE_TIM3_CH2 == 1)
-#define TIM3_CH2_GPIO             GPIOB
-#define TIM3_CH2_PIN              GPIO_Pin_5
-#define TIM3_CH2_PINSOURCE        GPIO_PinSource5
-#endif
-#if(configUSE_TIM3_CH3 == 1)
-#define TIM3_CH3_GPIO             GPIOB
-#define TIM3_CH3_PIN              GPIO_Pin_0
-#define TIM3_CH3_PINSOURCE        GPIO_PinSource0
-#endif
-#if(configUSE_TIM3_CH4 == 1)
-#define TIM3_CH4_GPIO             GPIOB
-#define TIM3_CH4_PIN              GPIO_Pin_1
-#define TIM3_CH4_PINSOURCE        GPIO_PinSource1
-#endif
-
-#define TIM4_CLOCK                    PPM_TIM_FREQ
-#define TIM4_PERIOD                   PPM_TIM_PERIOD
-#define TIM4_IRQ_PRIORITY              3
-#define TIM4_PWM_OUT                  1
-#define TIM4_PPM_IN                   0
-#if(configUSE_TIM4_CH1 == 1)
-#define TIM4_CH1_GPIO             GPIOA
-#define TIM4_CH1_PIN              GPIO_Pin_7
-#define TIM4_CH1_PINSOURCE        GPIO_PinSource5
-#endif
-#if(configUSE_TIM4_CH2 == 1)
-#define TIM4_CH2_GPIO             GPIOA
-#define TIM4_CH2_PIN              GPIO_Pin_7
-#define TIM4_CH2_PINSOURCE        GPIO_PinSource5
-#endif
-#if(configUSE_TIM4_CH3 == 1)
-#define TIM4_CH3_GPIO             GPIOA
-#define TIM4_CH3_PIN              GPIO_Pin_7
-#define TIM4_CH3_PINSOURCE        GPIO_PinSource5
-#endif
-#if(configUSE_TIM4_CH4 == 1)
-#define TIM4_CH4_GPIO             GPIOA
-#define TIM4_CH4_PIN              GPIO_Pin_7
-#define TIM4_CH4_PINSOURCE        GPIO_PinSource5
-#endif
-
-#define TIM12_CLOCK                   TEMP_TIM_FREQ
-#define TIM12_PERIOD                  TEMP_TIM_PERIOD
-#define TIM12_IRQ_PRIORITY              3
-#define TIM12_PWM_OUT                 1
-#define TIM12_PPM_IN                  0
-#if(configUSE_TIM12_CH1 == 1)
-#define TIM12_CH1_GPIO            GPIOB
-#define TIM12_CH1_PIN             GPIO_Pin_14
-#define TIM12_CH1_PINSOURCE       GPIO_PinSource14
-#endif
-#if(configUSE_TIM12_CH2 == 1)
-#define TIM12_CH2_GPIO            GPIOA
-#define TIM12_CH2_PIN             GPIO_Pin_7
-#define TIM12_CH2_PINSOURCE       GPIO_PinSource5
-#endif
-#if(configUSE_TIM12_CH3 == 1)
-#define TIM12_CH3_GPIO            GPIOA
-#define TIM12_CH3_PIN             GPIO_Pin_7
-#define TIM12_CH3_PINSOURCE       GPIO_PinSource5
-#endif
-#if(configUSE_TIM12_CH4 == 1)
-#define TIM12_CH4_GPIO            GPIOA
-#define TIM12_CH4_PIN             GPIO_Pin_7
-#define TIM12_CH4_PINSOURCE       GPIO_PinSource5
-#endif
 
 #endif
 

@@ -20,6 +20,7 @@
 #include "ublox.h"
 #include "tfminiplus.h"
 #include "LC302.h"
+#include "PX4FLOW.h"
 #include "drv_pwm.h"
 #include "rotation.h"
 
@@ -156,6 +157,8 @@ void ToFAltitmeterInit(void) {
 void OptFlowInit(void) {
     if (OPTFLOW_TYPE == LC302) {
         LC302_init();
+    } else if (OPTFLOW_TYPE == PX4FLOW) {
+        PX4FLOW_Init();
     }
 }
 

@@ -92,6 +92,7 @@ enum {
 enum {
     LC302,
     VLX53xx,
+    PX4FLOW
 };
 
 enum {
