@@ -69,7 +69,6 @@
 #define TEMP_TIM             htim1
 #define TEMP_CH              1
 
-#define PWM_TIM_1            htim2
 #define PWM_TIM_FREQ         480000       //无刷电机电调输出PWM输出定时器配置
 #define PWM_TIM_PERIOD       1000
 #define PWM1_TIM             htim2

@@ -24,15 +24,15 @@ void PWM_Init(void) {
     MX_TIM4_Init();
     MX_TIM8_Init();
 
-    HAL_TIM_PWM_Start(&PWM_TIM_1, PWM1_CH);
-    HAL_TIM_PWM_Start(&PWM_TIM_1, PWM2_CH);
-    HAL_TIM_PWM_Start(&PWM_TIM_1, PWM3_CH);
-    HAL_TIM_PWM_Start(&PWM_TIM_1, PWM4_CH);
+    HAL_TIM_PWM_Start(&PWM1_TIM, PWM1_CH);
+    HAL_TIM_PWM_Start(&PWM2_TIM, PWM2_CH);
+    HAL_TIM_PWM_Start(&PWM3_TIM, PWM3_CH);
+    HAL_TIM_PWM_Start(&PWM4_TIM, PWM4_CH);
 
     HAL_TIM_PWM_Start(&SERVO_PWM1_TIM, SERVO_PWM1_CH);
-    HAL_TIM_PWM_Start(&SERVO_PWM1_TIM, SERVO_PWM2_CH);
-    HAL_TIM_PWM_Start(&SERVO_PWM1_TIM, SERVO_PWM3_CH);
-    HAL_TIM_PWM_Start(&SERVO_PWM1_TIM, SERVO_PWM4_CH);
+    HAL_TIM_PWM_Start(&SERVO_PWM2_TIM, SERVO_PWM2_CH);
+    HAL_TIM_PWM_Start(&SERVO_PWM3_TIM, SERVO_PWM3_CH);
+    HAL_TIM_PWM_Start(&SERVO_PWM4_TIM, SERVO_PWM4_CH);
 }
 
 /**********************************************************************************************************
