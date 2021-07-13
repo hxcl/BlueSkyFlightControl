@@ -7,8 +7,9 @@
 
 void PWM_Init(void);
 void TempControlPWMSet(int32_t pwmValue);
-void ServoControlPWMSet(uint8_t motor, int32_t pwmValue);
+void ServoControlPWMSet(uint8_t motor, int16_t pwmValue);
 void MotorPWMSet(uint8_t motor, uint16_t pwmValue);
+void BeepPWMSet(uint16_t pwmValue);
 
 #endif
 

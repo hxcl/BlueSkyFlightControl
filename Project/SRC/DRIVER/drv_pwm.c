@@ -33,6 +33,12 @@ void PWM_Init(void) {
     HAL_TIM_PWM_Start(&SERVO_PWM2_TIM, SERVO_PWM2_CH);
     HAL_TIM_PWM_Start(&SERVO_PWM3_TIM, SERVO_PWM3_CH);
     HAL_TIM_PWM_Start(&SERVO_PWM4_TIM, SERVO_PWM4_CH);
+
+    //Beep
+    HAL_TIMEx_PWMN_Start(&htim8, TIM_CHANNEL_3);
+
+    //温控
+    HAL_TIM_PWM_Start(&TEMP_TIM, TEMP_CH);
 }
 
 /**********************************************************************************************************
@@ -50,20 +56,21 @@ void TempControlPWMSet(int32_t pwmValue) {
 /**********************************************************************************************************
 *函 数 名: ServoControlPWMSet
 *功能说明: 舵机PWM输出值设置
-*形    参: Servo number & PWM value（0-2000）
+*形    参: Servo number & Target angle
 *返 回 值: 无
 **********************************************************************************************************/
-void ServoControlPWMSet(uint8_t motor, int32_t pwmValue) {
-    pwmValue = pwmValue / 2 + 1000;
+void ServoControlPWMSet(uint8_t motor, int16_t targetAngle) {
+
+    int16_t temp = 0.05 * 20000 * targetAngle / 90 + 0.075 * 20000;
 
     if (motor == 1) {
-        __HAL_TIM_SET_COMPARE(&SERVO_PWM1_TIM, SERVO_PWM1_CH, pwmValue);
+        __HAL_TIM_SET_COMPARE(&SERVO_PWM1_TIM, SERVO_PWM1_CH, temp);
     } else if (motor == 2) {
-        __HAL_TIM_SET_COMPARE(&SERVO_PWM2_TIM, SERVO_PWM2_CH, pwmValue);
+        __HAL_TIM_SET_COMPARE(&SERVO_PWM2_TIM, SERVO_PWM2_CH, temp);
     } else if (motor == 3) {
-        __HAL_TIM_SET_COMPARE(&SERVO_PWM3_TIM, SERVO_PWM3_CH, pwmValue);
+        __HAL_TIM_SET_COMPARE(&SERVO_PWM3_TIM, SERVO_PWM3_CH, temp);
     } else if (motor == 4) {
-        __HAL_TIM_SET_COMPARE(&SERVO_PWM4_TIM, SERVO_PWM4_CH, pwmValue);
+        __HAL_TIM_SET_COMPARE(&SERVO_PWM4_TIM, SERVO_PWM4_CH, temp);
     }
 }
 
@@ -89,4 +96,15 @@ void MotorPWMSet(uint8_t motor, uint16_t pwmValue) {
     } else if (motor == 4) {
         __HAL_TIM_SET_COMPARE(&PWM4_TIM, PWM4_CH, pwmValue);
     }
+}
+
+/**********************************************************************************************************
+*函 数 名: BeepPWMSet
+*功能说明: 蜂鸣器PWM输出值设置
+*形    参: PWM值（0-2000）
+*返 回 值: 无
+**********************************************************************************************************/
+void BeepPWMSet(uint16_t pwmValue) {
+    uint16_t temp = 2000 - pwmValue;
+    __HAL_TIM_SET_COMPARE(&Beep_TIM, Beep_CH, pwmValue);
 }

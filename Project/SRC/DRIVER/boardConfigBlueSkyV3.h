@@ -67,7 +67,11 @@
 #define TEMP_TIM_FREQ        1000000        //传感器恒温PWM输出定时器配置
 #define TEMP_TIM_PERIOD      2500
 #define TEMP_TIM             htim1
-#define TEMP_CH              1
+#define TEMP_CH              TIM_CHANNEL_1
+
+#define Beep_TIM_FREQ        2000           //蜂鸣器PWM输出频率
+#define Beep_TIM             htim8
+#define Beep_CH              TIM_CHANNEL_3
 
 #define PWM_TIM_FREQ         480000       //无刷电机电调输出PWM输出定时器配置
 #define PWM_TIM_PERIOD       1000
