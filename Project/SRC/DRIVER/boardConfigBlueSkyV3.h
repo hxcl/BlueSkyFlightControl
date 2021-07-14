@@ -47,7 +47,7 @@
 
 #define MAG_I2C              hi2c2          //磁力计I2C配置
 
-#define PX4FLOW_I2C          hi2c4          //PX4FLOW I2C配置
+#define PX4FLOW_I2C          hi2c1          //PX4FLOW I2C配置
 
 #define GPS_UART             3              //GPS串口配置
 #define GPS_BAUDRATE         0              //波特率默认115200，可自动识别并对gps模块进行配置

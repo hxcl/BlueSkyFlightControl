@@ -14,6 +14,8 @@
 #include "PX4FLOW.h"
 #include "board.h"
 
+#define USE_TOF_ALTITUDE
+
 typedef struct {
     float time_s;
     bool update_flag;
@@ -86,7 +88,7 @@ void OptFlowDataTreat(void) {
 
     static float compensation_gyro_y = 0;
 
-    int temp_x_flow, temp_y_flow;
+    float temp_x_flow, temp_y_flow;
 
     float deltaT = (GetSysTimeUs() - lastTime) * 1e-6;
     lastTime = GetSysTimeUs();
@@ -179,13 +181,20 @@ void OptFlowDataTreat(void) {
             gyro_phase_x = PX4FLOW_GetGyroX_Integral() / 10.f;
             gyro_phase_y = PX4FLOW_GetGyroY_Integral() / 10.f;
 
+            temp_x_flow = temp_x_flow + gyro_phase_x;
+            temp_y_flow = temp_y_flow + gyro_phase_y;
+
             int timespan = PX4FLOW_GetTimestamp_Integral();
 
+#ifdef USE_TOF_ALTITUDE
+            float ground_distance = ToFAltimeterGetAlt() * 10.f;
+#else
             // 当前应用场景不太可能有超过 400cm 的高度，此时认为声呐高度失效
-            int ground_distance = PX4FLOW_GetGroundDistance_Integral() * 10.f;
+            int ground_distance = PX4FLOW_GetGroundDistance_Integral();
             if (ground_distance >= 400) {
-                ground_distance = ToFAltimeterGetAlt();
+                ground_distance = ToFAltimeterGetAlt() * 10.f;
             }
+#endif
 
             up_optflow_manager.Ref_gnd_vel_x =
                     up_optflow_manager.Ref_gnd_vel_x * 0.5 +
@@ -195,6 +204,7 @@ void OptFlowDataTreat(void) {
                     0.5 * 100 * temp_y_flow * ground_distance / timespan;     // cm/s
 
             // Integrate velocity to get pose estimate
+            // cm
             up_optflow_manager.Gnd_Position_x += up_optflow_manager.Ref_gnd_vel_x * (float) timespan / 1000000.f;
             up_optflow_manager.Gnd_Position_y += up_optflow_manager.Ref_gnd_vel_y * (float) timespan / 1000000.f;
         }

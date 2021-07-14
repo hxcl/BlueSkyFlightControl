@@ -51,8 +51,8 @@ void UserControl(void)
     //获取摇杆数据
     rcCommand = GetRcCommad();
 
-    rcCommand.roll  = ApplyDeadbandInt(rcCommand.roll, 100);
-    rcCommand.pitch = ApplyDeadbandInt(rcCommand.pitch, 100);
+    rcCommand.roll  = ApplyDeadbandInt(rcCommand.roll, 120);
+    rcCommand.pitch = ApplyDeadbandInt(rcCommand.pitch, 120);
 
     //通用控制部分，将摇杆量转换为横滚俯仰的目标控制角度
     rcTarget.roll  = rcCommand.roll  * rollRate;

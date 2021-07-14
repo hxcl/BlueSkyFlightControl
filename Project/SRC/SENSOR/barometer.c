@@ -142,7 +142,7 @@ static void BaroDetectCheck(int32_t baroAlt)
         if(cnt > 20)
         {
             //未检测到气压传感器
-            FaultDetectSetError(BARO_UNDETECTED);
+            //FaultDetectSetError(BARO_UNDETECTED);
         }
     }
     else

@@ -30,7 +30,7 @@
 #define IMU_SENSOR_READ_TASK_STACK            256
 #define SENSOR_UPDATE_TASK_STACK              256
 #define IMU_DATA_PRETREAT_TASK_STACK          256
-#define OTHER_SENSOR_TASK_STACK               256
+#define OTHER_SENSOR_TASK_STACK               512
 #define NAVIGATION_TASK_STACK                 512
 #define FLIGHT_STATUS_TASK_STACK              256
 #define FLIGHTCONTROL_TASK_STACK              256

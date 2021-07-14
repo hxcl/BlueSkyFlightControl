@@ -5,8 +5,6 @@
 #ifndef PX4FLOW_H
 #define PX4FLOW_H
 
-#define PX4FLOW_I2C hi2c4
-
 // 7 Bit I2C Address of the Flow Module: Default 0x42 (user selectable bits 0,1,2)
 #define PX4FLOW_ADDRESS 0x42
 

@@ -835,8 +835,8 @@ void BsklinkSendVelAnalyse(uint8_t* sendFlag)
     payload.gpsVel.x      = GetCopterVelMeasure()[GPS_VEL_X];             //GPS速度 单位：cm/s
     payload.gpsVel.y      = GetCopterVelMeasure()[GPS_VEL_Y];
     payload.gpsVel.z      = GetCopterVelMeasure()[GPS_VEL_Z];
-    payload.opticalVelX   = 0;                                            //光流速度 单位：cm/s
-    payload.opticalVelY   = 0;
+    payload.opticalVelX   = OptFlowGetGroundVelocityX();                  //光流速度 单位：cm/s
+    payload.opticalVelY   = OptFlowGetGroundVelocityY();
     payload.baroVel       = BaroGetVelocity();
     payload.tofVel        = ToFAltimeterGetVelocity();
     payload.velEstError.x = 0;                                            //速度估计误差 单位：cm/s
@@ -886,14 +886,14 @@ void BsklinkSendPosAnalyse(uint8_t* sendFlag)
     payload.position.x    = GetCopterPosition().x;               //位置估计值 单位：cm
     payload.position.y    = GetCopterPosition().y;
     payload.position.z    = GetCopterPosition().z;
-    payload.posTarget.x   = GetPosOuterCtlTarget().x;           //位置目标 单位：cm
+    payload.posTarget.x   = GetPosOuterCtlTarget().x;            //位置目标 单位：cm
     payload.posTarget.y   = GetPosOuterCtlTarget().y;
     payload.posTarget.z   = GetPosOuterCtlTarget().z;
     payload.gpsPos.x      = GetCopterPosMeasure().x;             //GPS位置 单位：cm
     payload.gpsPos.y      = GetCopterPosMeasure().y;
     payload.gpsPos.z      = 0;
-    payload.opticalPosX   = 0;                                   //光流位置 单位：cm
-    payload.opticalPosY   = 0;
+    payload.opticalPosX   = OptFlowGetGroundPositionX();         //光流位置 单位：cm
+    payload.opticalPosY   = OptFlowGetGroundPositionY();
     payload.baroAlt       = GetCopterPosMeasure().z;             //气压高度 单位：cm
     payload.tofAlt        = ToFAltimeterGetAlt();                //TOF高度 单位：cm
     payload.posEstError.x = 0;                                   //高度估计误差 单位：cm
@@ -942,11 +942,11 @@ void BsklinkSendUserDefine(uint8_t* sendFlag)
     //数据负载填充
     payload.data1   = TFminiPlus_GetDistance();
     payload.data2   = TFminiPlus_GetSignalStrength()/100;
-    payload.data3   = OptFlowGetGroundPositionX();
-    payload.data4   = OptFlowGetGroundPositionY();
-    payload.data5   = OptFlowGetGroundVelocityX();
-    payload.data6   = OptFlowGetGroundVelocityY();
-    payload.data7   = PX4FLOW_GetGroundDistance_Integral();
+    payload.data3   = PX4FLOW_GetGroundDistance_Integral()/10;  // PX4FLOW 高度
+    payload.data4   = 0;
+    payload.data5   = 0;
+    payload.data6   = 0;
+    payload.data7   = 0;
     payload.data8   = 8;
     payload.data9   = 9;
     payload.data10  = 10;

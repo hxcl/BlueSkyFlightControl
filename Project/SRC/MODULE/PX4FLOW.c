@@ -15,7 +15,8 @@ void PX4FLOW_Init() {
 }
 
 void PX4FLOW_Update() {
-    HAL_I2C_Mem_Read(&PX4FLOW_I2C, PX4FLOW_ADDRESS << 1, PX4FLOW_DATA_REG, I2C_ADDRESSINGMODE_7BIT, raw, PX4FLOW_FLAME_LEN,
+    HAL_I2C_Mem_Read(&PX4FLOW_I2C, PX4FLOW_ADDRESS << 1, PX4FLOW_DATA_REG, I2C_ADDRESSINGMODE_7BIT, raw,
+                     PX4FLOW_FLAME_LEN,
                      100);
     frame.frame_count = (raw[1] << 8) + raw[0];
     frame.pixel_flow_x_sum = (raw[3] << 8) + raw[2];
