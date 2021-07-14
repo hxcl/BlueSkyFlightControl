@@ -132,7 +132,7 @@ portTASK_FUNCTION(vStartTask, pvParameters) {
     NavigationTaskCreate();
     ControlTaskCreate();
     MessageTaskCreate();
-//    LogTaskCreate();
+    LogTaskCreate();
 
     //vTaskDelete(NULL);
     for (;;) {
