@@ -119,7 +119,7 @@ portTASK_FUNCTION(vOtherSensorTask, pvParameters)
             // ToF 激光测距高度传感器数据处理
             ToFAltimeterDataTreat();
             // 光流数据处理
-            OptflowDataTreat();
+            OptFlowDataTreat();
         }
 
         //25Hz

@@ -47,6 +47,8 @@ typedef struct {
     uint8_t quality;// averaged quality of accumulated flow values [0:bad quality;255: max quality]
 } px4flow_integral_t;
 
+void PX4FLOW_Init(void);
+
 void PX4FLOW_Update(void);
 
 void PX4FLOW_Integral_Update(void);

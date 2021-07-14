@@ -24,6 +24,7 @@
 #include "magnetometer.h"
 #include "accelerometer.h"
 #include "barometer.h"
+#include "optflow.h"
 #include "motor.h"
 #include "rc.h"
 #include "gps.h"
@@ -32,6 +33,7 @@
 #include "battery.h"
 #include "faultDetect.h"
 #include "tfminiplus.h"
+#include "PX4FLOW.h"
 
 #include "string.h"
 
@@ -940,11 +942,11 @@ void BsklinkSendUserDefine(uint8_t* sendFlag)
     //数据负载填充
     payload.data1   = TFminiPlus_GetDistance();
     payload.data2   = TFminiPlus_GetSignalStrength()/100;
-    payload.data3   = 3;
-    payload.data4   = 4;
-    payload.data5   = 5;
-    payload.data6   = 6;
-    payload.data7   = 7;
+    payload.data3   = OptFlowGetGroundPositionX();
+    payload.data4   = OptFlowGetGroundPositionY();
+    payload.data5   = OptFlowGetGroundVelocityX();
+    payload.data6   = OptFlowGetGroundVelocityY();
+    payload.data7   = PX4FLOW_GetGroundDistance_Integral();
     payload.data8   = 8;
     payload.data9   = 9;
     payload.data10  = 10;

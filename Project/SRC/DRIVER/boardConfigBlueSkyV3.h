@@ -45,7 +45,7 @@
 
 #define BARO_I2C             hi2c1              //气压计I2C配置
 
-#define MAG_I2C              hi2c2              //磁力计I2C配置
+#define MAG_I2C              hi2c2          //磁力计I2C配置
 
 #define PX4FLOW_I2C          hi2c4          //PX4FLOW I2C配置
 

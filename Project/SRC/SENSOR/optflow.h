@@ -9,8 +9,18 @@
 #include "stdbool.h"
 #include "mathTool.h"
 
-void OptflowDataTreat(void);
+void OptFlowDataTreat(void);
 
-void OptflowDataClear(void);
+void OptFlowDataClear(void);
+
+int OptFlowGetGroundPositionX(void);
+
+int OptFlowGetGroundPositionY(void);
+
+int OptFlowGetGroundVelocityX(void);
+
+int OptFlowGetGroundVelocityY(void);
+
+void OptFlowClearGroundPosition(void);
 
 #endif //OPTFLOW_H

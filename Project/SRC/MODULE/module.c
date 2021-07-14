@@ -143,7 +143,7 @@ void BaroSensorInit(void) {
     }
     //未检测到气压计
     if (!detectFlag) {
-        FaultDetectSetError(BARO_UNDETECTED);
+        //FaultDetectSetError(BARO_UNDETECTED);
     }
 
 }

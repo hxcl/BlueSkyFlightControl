@@ -15,6 +15,7 @@
 #include "kalman3.h"
 #include "kalmanVel.h"
 #include "gps.h"
+#include "optflow.h"
 #include "barometer.h"
 #include "ToF_altimeter.h"
 #include "flightStatus.h"
@@ -110,8 +111,8 @@ void VelocityEstimate(void)
 //    */
 //    KalmanVelUpdate(&kalmanVel, &nav.velocity, &nav.accel_bias, nav.accel, nav.velMeasure, deltaT, fuseFlag);
 
-    nav.velocity.x = 0;
-    nav.velocity.y = 0;
+    nav.velocity.x = OptFlowGetGroundVelocityX();
+    nav.velocity.y = OptFlowGetGroundVelocityY();
     nav.velocity.z = ToFAltimeterGetVelocity();
 }
 
@@ -172,8 +173,8 @@ void PositionEstimate(void)
 //    //位置估计
 //    KalmanUpdate(&kalmanPos, input, nav.posMeasure, fuseFlag);
 //    nav.position = kalmanPos.state;
-    nav.position.x = 0;
-    nav.position.y = 0;
+    nav.position.x = OptFlowGetGroundPositionX();
+    nav.position.y = OptFlowGetGroundPositionY();
     nav.position.z = ToFAltimeterGetAlt();
 }
 
