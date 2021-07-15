@@ -516,6 +516,10 @@ void FlightStatusUpdate(void)
             if(GetAltControlStatus() == ALT_HOLD || rcData.throttle > MIDCHECK)
                 SetFlightStatus(IN_AIR);
         }
+
+        if(GetCopterPosition().z < 5){
+            SetFlightStatus(FINISH_LANDING);
+        }
         //降落检测实现比较麻烦，因为要保证安全（不出现误检测）的同时要提升检测的速度（落地后能够立即完成检测）
         //目前的检测方式为检测垂直方向的控制误差超过一定值并持续一定时间便认为已落地
         //通过检测落地时产生的震动来加快检测

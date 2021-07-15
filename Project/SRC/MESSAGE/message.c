@@ -84,8 +84,8 @@ void MessageInit(void)
     bsklinkSendFreq[BSKLINK_MSG_ID_GPS]                = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_BATTERY]            = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_ATT_ANALYSE]        = 1;
-    bsklinkSendFreq[BSKLINK_MSG_ID_VEL_ANALYSE]        = 1;
-    bsklinkSendFreq[BSKLINK_MSG_ID_POS_ANALYSE]        = 1;
+    bsklinkSendFreq[BSKLINK_MSG_ID_VEL_ANALYSE]        = 10;
+    bsklinkSendFreq[BSKLINK_MSG_ID_POS_ANALYSE]        = 10;
     bsklinkSendFreq[BSKLINK_MSG_ID_USER_DEFINE]        = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_SYS_ERROR]          = 1;     //固定1Hz
     bsklinkSendFreq[BSKLINK_MSG_ID_SYS_WARNING]        = 1;     //固定1Hz

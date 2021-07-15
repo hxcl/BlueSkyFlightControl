@@ -35,7 +35,7 @@
 #define BARO_COMMUNICATE_TYPE   BARO_I2C    //气压计通信接口
 #define MAG_TYPE             IST8310        //罗盘型号
 #define ToFALTIMETER_TYPE    TFMINIPLUS
-#define OPTFLOW_TYPE         PX4FLOW
+#define OPTFLOW_TYPE         LC302
 
 #define configUSE_SENSORHEAT 0              //是否使用传感器恒温
 

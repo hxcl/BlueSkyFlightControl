@@ -15,12 +15,7 @@
 #include "string.h"
 #include "drv_sbus.h"
 #include "tfminiplus.h"
-
-uint8_t COM1TxBuf[256];
-uint8_t COM2TxBuf[256];
-uint8_t COM3TxBuf[256];
-uint8_t COM4TxBuf[256];
-uint8_t COM5TxBuf[256];
+#include "LC302.h"
 
 uint8_t COM1RxBuf[32];
 uint8_t COM2RxBuf[32];
@@ -46,6 +41,9 @@ void Uart_Init() {
 
     // ToF sensor communication via COM2(huart3)
     HAL_UART_Receive_DMA(&COM2, COM2RxBuf, 1);
+
+    // LC302 via COM4(huart7)
+    HAL_UART_Receive_DMA(&COM4, COM4RxBuf, 1);
 
     // S.BUS via COM5(huart8)
     HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
@@ -79,6 +77,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     } else if (huart == &COM2) {
         TFminiPlus_Decode(COM2RxBuf[0]);
         //HAL_UART_Receive_IT(&COM2, COM2RxBuf, 1);
+    } else if (huart == &COM4) {
+        LC302_Decode(COM4RxBuf[0]);
     } else if (huart == &COM5) {
         Sbus_Decode(COM5RxBuf[0]);
         HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);

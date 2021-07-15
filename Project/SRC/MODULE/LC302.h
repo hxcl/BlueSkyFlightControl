@@ -5,11 +5,11 @@
 #ifndef LC302_H
 #define LC302_H
 
-#include "stdbool.h"
+#include "board.h"
 
 void LC302_init(void);
 
-void LC302_update(void);
+void LC302_Decode(uint8_t data);
 
 int LC302_get_X_Integral(void);
 

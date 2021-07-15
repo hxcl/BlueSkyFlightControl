@@ -16,6 +16,8 @@
 
 #define USE_TOF_ALTITUDE
 
+#define LPF_1_(hz,t,in,out) ((out) += ( 1 / ( 1 + 1 / ( (hz) *6.28f *(t) ) ) ) *( (in) - (out) ))
+
 typedef struct {
     float time_s;
     bool update_flag;
@@ -65,7 +67,6 @@ up_optflow_manager_t up_optflow_manager;
 
 void OptFlowDataTreat(void) {
     static uint64_t lastTime = 0;
-    int32_t ToFAltTemp;
 
     static float xielv_tmp = 0;
 
@@ -90,11 +91,7 @@ void OptFlowDataTreat(void) {
 
     float temp_x_flow, temp_y_flow;
 
-    float deltaT = (GetSysTimeUs() - lastTime) * 1e-6;
-    lastTime = GetSysTimeUs();
-
     if (OPTFLOW_TYPE == LC302) {
-        LC302_update();
         if (LC302_getAvaliable()) {
             temp_x_flow = LC302_get_X_Integral();
             temp_y_flow = LC302_get_Y_Integral();
@@ -103,8 +100,6 @@ void OptFlowDataTreat(void) {
         } else {
             up_optflow_manager.update_flag = false;
         }
-        //反向Y轴数据
-        temp_x_flow *= -1;
 
         //20.8ms = 0.02s
         up_optflow_manager.time_s = 0.02f;
@@ -127,14 +122,14 @@ void OptFlowDataTreat(void) {
 #endif
 
         //lpf
-        //LPF_1_(15, 0.02f, up_optflow_manager.Velocity_x, up_optflow_manager.Velocity_x_lpf);
-        //LPF_1_(15, 0.02f, up_optflow_manager.Velocity_y, up_optflow_manager.Velocity_y_lpf);
+        LPF_1_(15, 0.02f, up_optflow_manager.Velocity_x, up_optflow_manager.Velocity_x_lpf);
+        LPF_1_(15, 0.02f, up_optflow_manager.Velocity_y, up_optflow_manager.Velocity_y_lpf);
 
-        up_optflow_manager.Gyro_x = ConstrainFloat(GyroGetData().x, -100, 100);
-        up_optflow_manager.Gyro_y = ConstrainFloat(GyroGetData().y, -100, 100);
+        up_optflow_manager.Gyro_x = ConstrainFloat(Radians(GyroGetData().x), -100, 100);
+        up_optflow_manager.Gyro_y = ConstrainFloat(Radians(GyroGetData().y), -100, 100);
 
-        //LPF_1_(4, 0.02f, up_optflow_manager.Gyro_x, up_optflow_manager.Gyro_x_phase);
-        //LPF_1_(4, 0.02f, up_optflow_manager.Gyro_y, up_optflow_manager.Gyro_y_phase);
+        LPF_1_(4, 0.02f, up_optflow_manager.Gyro_x, up_optflow_manager.Gyro_x_phase);
+        LPF_1_(4, 0.02f, up_optflow_manager.Gyro_y, up_optflow_manager.Gyro_y_phase);
 
 #ifdef OPT_FLOW_PLACE_BACK_LINE
         up_optflow_manager.Velocity_uncoupled_x = (up_optflow_manager.Velocity_x_lpf - up_optflow_manager.Gyro_x_phase);
@@ -176,18 +171,19 @@ void OptFlowDataTreat(void) {
     } else if (OPTFLOW_TYPE == PX4FLOW) {
         PX4FLOW_Integral_Update();
         if (PX4FLOW_GetQuality_Integral() > 100) {
-            temp_x_flow = PX4FLOW_GetPixelFlowX_Integral() / 10.f;
-            temp_y_flow = PX4FLOW_GetPixelFlowY_Integral() / 10.f;
-            gyro_phase_x = PX4FLOW_GetGyroX_Integral() / 10.f;
-            gyro_phase_y = PX4FLOW_GetGyroY_Integral() / 10.f;
+            temp_x_flow = (float)PX4FLOW_GetPixelFlowX_Integral() / 10.f;
+            temp_y_flow = (float)PX4FLOW_GetPixelFlowY_Integral() / 10.f;
+            gyro_phase_x = (float)PX4FLOW_GetGyroX_Integral() / 10.f;
+            gyro_phase_y = (float)PX4FLOW_GetGyroY_Integral() / 10.f;
 
             temp_x_flow = temp_x_flow + gyro_phase_x;
             temp_y_flow = temp_y_flow + gyro_phase_y;
 
-            int timespan = PX4FLOW_GetTimestamp_Integral();
+            uint32_t timespan = PX4FLOW_GetTimestamp_Integral();
 
 #ifdef USE_TOF_ALTITUDE
-            float ground_distance = ToFAltimeterGetAlt() * 10.f;
+            // mm
+            float ground_distance = (float)ToFAltimeterGetAlt() * 10.f;
 #else
             // 当前应用场景不太可能有超过 400cm 的高度，此时认为声呐高度失效
             int ground_distance = PX4FLOW_GetGroundDistance_Integral();
@@ -195,35 +191,31 @@ void OptFlowDataTreat(void) {
                 ground_distance = ToFAltimeterGetAlt() * 10.f;
             }
 #endif
-
-            up_optflow_manager.Ref_gnd_vel_x =
-                    up_optflow_manager.Ref_gnd_vel_x * 0.5 +
-                    0.5 * 100 * temp_x_flow * ground_distance / timespan;     // cm/s
-            up_optflow_manager.Ref_gnd_vel_y =
-                    up_optflow_manager.Ref_gnd_vel_y * 0.5 +
-                    0.5 * 100 * temp_y_flow * ground_distance / timespan;     // cm/s
+            // 100 * mrad * mm / us = cm
+            up_optflow_manager.Ref_gnd_vel_x = -100 * temp_x_flow * ground_distance / 10000;     // cm/s
+            up_optflow_manager.Ref_gnd_vel_y = 100 * temp_y_flow * ground_distance / 10000;     // cm/s
 
             // Integrate velocity to get pose estimate
             // cm
-            up_optflow_manager.Gnd_Position_x += up_optflow_manager.Ref_gnd_vel_x * (float) timespan / 1000000.f;
-            up_optflow_manager.Gnd_Position_y += up_optflow_manager.Ref_gnd_vel_y * (float) timespan / 1000000.f;
+            up_optflow_manager.Gnd_Position_x += up_optflow_manager.Ref_gnd_vel_x / 100.f;
+            up_optflow_manager.Gnd_Position_y += up_optflow_manager.Ref_gnd_vel_y / 100.f;
         }
     }
 }
 
-int OptFlowGetGroundPositionX(void) {
+float OptFlowGetGroundPositionX(void) {
     return up_optflow_manager.Gnd_Position_x;
 }
 
-int OptFlowGetGroundPositionY(void) {
+float OptFlowGetGroundPositionY(void) {
     return up_optflow_manager.Gnd_Position_y;
 }
 
-int OptFlowGetGroundVelocityX(void) {
+float OptFlowGetGroundVelocityX(void) {
     return up_optflow_manager.Ref_gnd_vel_x;
 }
 
-int OptFlowGetGroundVelocityY(void) {
+float OptFlowGetGroundVelocityY(void) {
     return up_optflow_manager.Ref_gnd_vel_y;
 }
 

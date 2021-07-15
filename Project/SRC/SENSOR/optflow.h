@@ -13,13 +13,13 @@ void OptFlowDataTreat(void);
 
 void OptFlowDataClear(void);
 
-int OptFlowGetGroundPositionX(void);
+float OptFlowGetGroundPositionX(void);
 
-int OptFlowGetGroundPositionY(void);
+float OptFlowGetGroundPositionY(void);
 
-int OptFlowGetGroundVelocityX(void);
+float OptFlowGetGroundVelocityX(void);
 
-int OptFlowGetGroundVelocityY(void);
+float OptFlowGetGroundVelocityY(void);
 
 void OptFlowClearGroundPosition(void);
 
