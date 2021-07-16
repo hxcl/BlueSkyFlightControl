@@ -42,8 +42,8 @@ void Uart_Init() {
     // ToF sensor communication via COM2(huart3)
     HAL_UART_Receive_DMA(&COM2, COM2RxBuf, 1);
 
-    // LC302 via COM4(huart7)
-    HAL_UART_Receive_DMA(&COM4, COM4RxBuf, 1);
+    // LC302 via COM3(huart4)
+    HAL_UART_Receive_IT(&COM3, COM4RxBuf, 1);
 
     // S.BUS via COM5(huart8)
     HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
@@ -77,8 +77,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     } else if (huart == &COM2) {
         TFminiPlus_Decode(COM2RxBuf[0]);
         //HAL_UART_Receive_IT(&COM2, COM2RxBuf, 1);
-    } else if (huart == &COM4) {
-        LC302_Decode(COM4RxBuf[0]);
+    } else if (huart == &COM3) {
+        LC302_Decode(COM3RxBuf[0]);
+        HAL_UART_Receive_IT(&COM3, COM3RxBuf, 1);
     } else if (huart == &COM5) {
         Sbus_Decode(COM5RxBuf[0]);
         HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);

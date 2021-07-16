@@ -15,6 +15,8 @@ int LC302_get_X_Integral(void);
 
 int LC302_get_Y_Integral(void);
 
+int LC302_getTimeSpan(void);
+
 bool LC302_getAvaliable(void);
 
 #endif //LC302_H
