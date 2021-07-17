@@ -41,8 +41,11 @@ static void SysPeriphClockInit(void);
 void BoardInit(void) {
 
     MX_GPIO_Init();
+
+#ifdef USE_LOG
     MX_SDMMC1_SD_Init();
     MX_FATFS_Init();
+#endif
 
     //RGB初始化
     RGB_Init();

@@ -80,10 +80,10 @@ void MessageInit(void)
     bsklinkSendFreq[BSKLINK_MSG_ID_SENSOR]             = 3;
     bsklinkSendFreq[BSKLINK_MSG_ID_SENSOR_CALI_DATA]   = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_RC_DATA]            = 3;
-    bsklinkSendFreq[BSKLINK_MSG_ID_MOTOR]              = 1;
+    bsklinkSendFreq[BSKLINK_MSG_ID_MOTOR]              = 10;
     bsklinkSendFreq[BSKLINK_MSG_ID_GPS]                = 1;
     bsklinkSendFreq[BSKLINK_MSG_ID_BATTERY]            = 1;
-    bsklinkSendFreq[BSKLINK_MSG_ID_ATT_ANALYSE]        = 1;
+    bsklinkSendFreq[BSKLINK_MSG_ID_ATT_ANALYSE]        = 10;
     bsklinkSendFreq[BSKLINK_MSG_ID_VEL_ANALYSE]        = 10;
     bsklinkSendFreq[BSKLINK_MSG_ID_POS_ANALYSE]        = 10;
     bsklinkSendFreq[BSKLINK_MSG_ID_USER_DEFINE]        = 1;

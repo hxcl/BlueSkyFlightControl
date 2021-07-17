@@ -44,9 +44,9 @@ void FlightControlInit(void) {
         PIDWriteToFlash();
     }
 
-    fc.maxBrakeAngle = 25;
-    fc.maxPosOuterCtl = 150;
-    fc.maxAltOuterCtl = 200;
+    fc.maxBrakeAngle = 10;
+    fc.maxPosOuterCtl = 30;
+    fc.maxAltOuterCtl = 100;
 }
 
 /**********************************************************************************************************
@@ -215,7 +215,7 @@ void AttitudeOuterControl(void) {
 
     //计算姿态外环控制误差：目标角度 - 实际角度
     //手动和半自动模式以及GPS失效下，摇杆量直接作为横滚和俯仰的目标量
-    if (flightMode == MANUAL || flightMode == SEMIAUTO || GpsGetFixStatus() == false) {
+    if (flightMode == MANUAL || flightMode == SEMIAUTO) {
         fc.attOuterError.x = fc.rcTarget.roll * 0.1f - fc.angleLpf.x;
         fc.attOuterError.y = fc.rcTarget.pitch * 0.1f - fc.angleLpf.y;
     } else {
@@ -229,18 +229,18 @@ void AttitudeOuterControl(void) {
 
     //PID控制输出限幅，目的是限制飞行中最大的运动角速度，单位为°/s
     //同时限制各种位置控制状态下的角速度，提升飞行过程中的控制感观
-    if (flightMode == MANUAL || flightMode == SEMIAUTO || GpsGetFixStatus() == false) {
+    if (flightMode == MANUAL || flightMode == SEMIAUTO) {
         attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -200, 200);
         attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -200, 200);
     } else if (GetPosControlStatus() == POS_CHANGED) {
-        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -100, 100);
-        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -100, 100);
+        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -50, 50);
+        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -50, 50);
     } else if (GetPosControlStatus() == POS_BRAKE) {
-        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -100, 100);
-        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -100, 100);
+        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -50, 50);
+        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -50, 50);
     } else {
-        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -100, 100);
-        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -100, 100);
+        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -50, 50);
+        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -50, 50);
     }
 
     //若航向锁定被失能则直接将摇杆数值作为目标角速度
@@ -354,8 +354,8 @@ void PositionInnerControl(void) {
         posInnerCtlOutput.x = ConstrainFloat(posInnerCtlOutput.x, -fc.maxBrakeAngle, fc.maxBrakeAngle);
         posInnerCtlOutput.y = ConstrainFloat(posInnerCtlOutput.y, -fc.maxBrakeAngle, fc.maxBrakeAngle);
     } else {
-        posInnerCtlOutput.x = ConstrainFloat(posInnerCtlOutput.x, -35, 35);
-        posInnerCtlOutput.y = ConstrainFloat(posInnerCtlOutput.y, -35, 35);
+        posInnerCtlOutput.x = ConstrainFloat(posInnerCtlOutput.x, -15, 15);
+        posInnerCtlOutput.y = ConstrainFloat(posInnerCtlOutput.y, -15, 15);
     }
 
     //将位置内环控制量作为姿态外环的控制目标
@@ -396,7 +396,8 @@ void PositionOuterControl(void) {
     posOuterCtlValue.y = PID_GetP(&fc.pid[POS_Y], fc.posOuterError.y);
 
     //将控制量转换到机体坐标系
-    TransVelToBodyFrame(posOuterCtlValue, &posOuterCtlValue, GetCopterAngle().z);
+    //不使用GPS时无需进行转换
+    //TransVelToBodyFrame(posOuterCtlValue, &posOuterCtlValue, GetCopterAngle().z);
 
     //PID控制输出限幅
     posOuterCtlValue.x = ConstrainFloat(posOuterCtlValue.x, -fc.maxPosOuterCtl, fc.maxPosOuterCtl);
