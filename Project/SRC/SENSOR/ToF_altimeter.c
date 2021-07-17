@@ -32,13 +32,15 @@ void ToFAltimeterDataTreat(void) {
 
     // 是否需要角度补偿？
     // 若姿态角限制在 10° 以内，误差不超过 2%
+    ToFAltTemp = ToFAltTemp * cosf(Radians(GetAngleMeasure().x)) * cosf(Radians(GetAngleMeasure().y));
 
     // 高度低通滤波
     // 激光测距是否准到能直接使用作为高度？
     tofaltimeter.alt = ToFAltTemp;
 
     // 速度低通滤波
-    tofaltimeter.velocity = tofaltimeter.velocity * 0.65f + ((tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT) * 0.35f;
+    tofaltimeter.velocity =
+            tofaltimeter.velocity * 0.65f + ((tofaltimeter.alt - tofaltimeter.lastAlt) / deltaT) * 0.35f;
     tofaltimeter.lastAlt = tofaltimeter.alt;
 
     ToFAltimeterDetectCheck(tofaltimeter.lastAlt);

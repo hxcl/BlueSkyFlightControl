@@ -34,6 +34,7 @@
 #include "faultDetect.h"
 #include "tfminiplus.h"
 #include "PX4FLOW.h"
+#include "LC302.h"
 
 #include "string.h"
 
@@ -941,17 +942,17 @@ void BsklinkSendUserDefine(uint8_t* sendFlag)
 
     //数据负载填充
     payload.data1   = TFminiPlus_GetDistance();
-    payload.data2   = TFminiPlus_GetSignalStrength()/100;
-    payload.data3   = PX4FLOW_GetGroundDistance_Integral()/10;  // PX4FLOW 高度
-    payload.data4   = 0;
-    payload.data5   = 0;
-    payload.data6   = 0;
+    payload.data2   = 0;
+    payload.data3   = OptFlowGetLPFVelocityX()*100;
+    payload.data4   = OptFlowGetLPFVelocityY()*100;
+    payload.data5   = OptFlowGetGyroPhaseX()*100;
+    payload.data6   = OptFlowGetGyroPhaseY()*100;
     payload.data7   = 0;
-    payload.data8   = 8;
-    payload.data9   = 9;
-    payload.data10  = 10;
-    payload.data11  = 11;
-    payload.data12  = 12;
+    payload.data8   = 0;
+    payload.data9   = 0;
+    payload.data10  = 0;
+    payload.data11  = 0;
+    payload.data12  = 0;
 
     /*********************************************消息帧赋值******************************************/
     msg.head1 	 = BSKLINK_MSG_HEAD_1;                           //帧头

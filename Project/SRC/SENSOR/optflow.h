@@ -21,6 +21,14 @@ float OptFlowGetGroundVelocityX(void);
 
 float OptFlowGetGroundVelocityY(void);
 
+float OptFlowGetLPFVelocityX(void);
+
+float OptFlowGetLPFVelocityY(void);
+
+float OptFlowGetGyroPhaseX(void);
+
+float OptFlowGetGyroPhaseY(void);
+
 void OptFlowClearGroundPosition(void);
 
 #endif //OPTFLOW_H

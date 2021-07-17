@@ -3,7 +3,6 @@
 //
 
 #include "optflow.h"
-#include "string.h"
 
 #include "boardConfigBlueSkyV3.h"
 #include "gyroscope.h"
@@ -13,11 +12,9 @@
 #include "LC302.h"
 #include "PX4FLOW.h"
 #include "board.h"
-#include "lowPassFilter.h"
+#include "ahrs.h"
 
 #define USE_TOF_ALTITUDE
-
-#define LPF_1_(hz, t, in, out) ((out) += ( 1 / ( 1 + 1 / ( (hz) *6.28f *(t) ) ) ) *( (in) - (out) ))
 
 typedef struct {
     float time_s;
@@ -93,9 +90,32 @@ void OptFlowDataTreat(void) {
         optflow_manager.Gyro_x_phase = (optflow_manager.Gyro_x * 0.334398 + optflow_manager.Gyro_x_phase * 0.665602);
         optflow_manager.Gyro_y_phase = (optflow_manager.Gyro_y * 0.334398 + optflow_manager.Gyro_y_phase * 0.665602);
 
+        // 角度变化大时光流像素速度将较角速度大，缩放值须测试标定
+//        float gyroXScale = 1, gyroYScale = 1;
+//        int x = abs(GetAngleMeasure().x);
+//        if (x < 3) {
+//            gyroXScale = 0.9;
+//        } else if (x > 3 && x < 6) {
+//            gyroXScale = 1.4;
+//        } else {
+//            gyroXScale = 1.9;
+//        }
+//
+//        int y = abs(GetAngleMeasure().y);
+//        if (y < 3) {
+//            gyroYScale = 0.9;
+//        } else if (y > 3 && y < 6) {
+//            gyroYScale = 1.4;
+//        } else {
+//            gyroYScale = 1.9;
+//        }
+//
+//        optflow_manager.Gyro_x_phase = gyroXScale * optflow_manager.Gyro_x_phase;
+//        optflow_manager.Gyro_y_phase = gyroYScale * optflow_manager.Gyro_y_phase;
+
         //陀螺仪解耦合，单位是像素Pix单位时间内像素的位移
         optflow_manager.Velocity_uncoupled_x = optflow_manager.Velocity_x_lpf + optflow_manager.Gyro_x_phase;
-        optflow_manager.Velocity_uncoupled_y = optflow_manager.Velocity_y_lpf - optflow_manager.Gyro_y_phase;
+        optflow_manager.Velocity_uncoupled_y = optflow_manager.Velocity_y_lpf + optflow_manager.Gyro_y_phase;
 
         //光流速度限幅
         optflow_manager.Velocity_uncoupled_x = ConstrainFloat(optflow_manager.Velocity_uncoupled_x, -100.0f, 100.0f);
@@ -163,6 +183,23 @@ float OptFlowGetGroundVelocityX(void) {
 
 float OptFlowGetGroundVelocityY(void) {
     return optflow_manager.Ref_gnd_vel_y;
+}
+
+// 光流调试时需要观察光流角速度和陀螺仪角速度之间的相位关系，因此提供以下四个函数
+float OptFlowGetLPFVelocityX(void) {
+    return optflow_manager.Velocity_x_lpf;
+}
+
+float OptFlowGetLPFVelocityY(void) {
+    return optflow_manager.Velocity_y_lpf;
+}
+
+float OptFlowGetGyroPhaseX(void) {
+    return optflow_manager.Gyro_x_phase;
+}
+
+float OptFlowGetGyroPhaseY(void) {
+    return optflow_manager.Gyro_y_phase;
 }
 
 void OptFlowClearGroundPosition(void) {
