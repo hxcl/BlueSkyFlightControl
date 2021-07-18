@@ -517,7 +517,7 @@ void FlightStatusUpdate(void)
                 SetFlightStatus(IN_AIR);
         }
 
-        if(GetCopterPosition().z < 5){
+        if(GetCopterPosition().z <= 5 && GetCopterVelocity().z <= 5){
             SetFlightStatus(FINISH_LANDING);
         }
         //降落检测实现比较麻烦，因为要保证安全（不出现误检测）的同时要提升检测的速度（落地后能够立即完成检测）
