@@ -425,7 +425,7 @@ void SetFlightMode(uint8_t mode)
         flyStatus.mode = AUTO;				//自动模式（定点）
         break;
     case    AUTOTAKEOFF:
-        //flyStatus.mode = AUTOTAKEOFF;		//自动起飞
+        flyStatus.mode = AUTOTAKEOFF;		//自动起飞
         break;
     case    AUTOLAND:
         if(flyStatus.armed == ARMED)

@@ -17,7 +17,6 @@
 #include "navigation.h"
 #include "ahrs.h"
 #include "gps.h"
-#include "rc.h"
 
 static Vector3f_t posCtlTarget;
 
@@ -26,6 +25,7 @@ static float rthHeight   = 3000;  //预设返航高度 单位：cm
 static float rthWaitTime = 2000;  //返航回到Home点后的悬停等待时间 单位：ms
 
 void AutoLand(void);
+void AutoTakeOff(void);
 void ReturnToHome(void);
 
 /**********************************************************************************************************
@@ -50,6 +50,9 @@ void MissionControl(void)
         //锁定状态下转为自动模式
         if(GetArmedStatus() == DISARMED)
             SetFlightMode(AUTO);
+    }
+    else if(flightMode == AUTOTAKEOFF){
+        AutoTakeOff();
     }
     else if(flightMode == RETURNTOHOME)
     {
@@ -89,15 +92,12 @@ void AutoLand(void)
     //使能航向锁定
     SetYawHoldStatus(ENABLE);
 
-    //GPS可用时，降落过程中保持位置不变，若不可用，降落过程中飞机姿态摇杆可控
-    if(GpsGetFixStatus() == true)
-    {
-        //使能位置控制
-        SetPosCtlStatus(ENABLE);
+    //原作者在此处根据GPS状态判断是否使能位置控制，先去掉
+    //使能位置控制
+    SetPosCtlStatus(ENABLE);
 
-        //更新位置控制目标
-        SetPosOuterCtlTarget(posCtlTarget);
-    }
+    //更新位置控制目标
+    SetPosOuterCtlTarget(posCtlTarget);
 
     //直接控制速度，禁用高度控制
     SetAltCtlStatus(DISABLE);
@@ -107,7 +107,16 @@ void AutoLand(void)
 
     //减速降落
     //在没有对地测距传感器的情况下，只能大致判断高度，提前进行减速
-    if(alttitude < 500)
+    if(alttitude < 10){
+        velCtlTarget = -3.f;
+    }
+    else if(alttitude < 64){
+        velCtlTarget = -0.5f * alttitude + 2;
+    }
+    else if(alttitude < 200){
+        velCtlTarget = velCtlTarget * 0.99f - 30.0f * 0.01f;
+    }
+    else if(alttitude < 500)
     {
         velCtlTarget = velCtlTarget * 0.99f - 70.0f * 0.01f;
     }
@@ -124,8 +133,49 @@ void AutoLand(void)
         velCtlTarget = velCtlTarget * 0.99f - 250.0f * 0.01f;
     }
 
-    //更新高度内环控制目标
+    //更新高度内环控制目标，速度限幅提高观感和安全性
+    velCtlTarget = ConstrainFloat(velCtlTarget, -10, 10);
     SetAltInnerCtlTarget(velCtlTarget);
+}
+
+void AutoTakeOff(void)
+{
+    // 高度控制目标
+    static float AltCtlTarget = 30;
+    float alttitude = GetCopterPosition().z;
+
+    // 待机模式刷新目标位置
+    if(GetFlightStatus() == STANDBY)
+    {
+        posCtlTarget.x = GetCopterPosition().x;
+        posCtlTarget.y = GetCopterPosition().y;
+    }
+
+    //使能航向锁定
+    SetYawHoldStatus(ENABLE);
+
+    //使能位置控制
+    SetPosCtlStatus(ENABLE);
+    SetPosControlStatus(POS_HOLD);
+
+    //更新位置控制目标
+    SetPosOuterCtlTarget(posCtlTarget);
+
+    //使能高度控制
+    SetAltCtlStatus(ENABLE);
+
+    //更新高度控制状态
+    SetAltControlStatus(ALT_CHANGED);
+
+    //更新高度外环控制目标
+    SetAltOuterCtlTarget(AltCtlTarget);
+
+    float err = (alttitude>AltCtlTarget)?(alttitude-AltCtlTarget):(AltCtlTarget-alttitude);
+
+    if(err < 5){
+        SetAltControlStatus(ALT_HOLD);
+        SetFlightMode(AUTOLAND);
+    }
 }
 
 /**********************************************************************************************************
