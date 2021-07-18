@@ -27,13 +27,12 @@ xTaskHandle sensorUpdateTask;
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-portTASK_FUNCTION(vImuSensorReadTask, pvParameters)
-{
+portTASK_FUNCTION(vImuSensorReadTask, pvParameters) {
     portTickType xLastWakeTime;
 
-    Vector3f_t* accRawData  = pvPortMalloc(sizeof(Vector3f_t));
-    Vector3f_t* gyroRawData = pvPortMalloc(sizeof(Vector3f_t));
-    float*      tempRawData = pvPortMalloc(sizeof(float));
+    Vector3f_t *accRawData = pvPortMalloc(sizeof(Vector3f_t));
+    Vector3f_t *gyroRawData = pvPortMalloc(sizeof(Vector3f_t));
+    float *tempRawData = pvPortMalloc(sizeof(float));
 
     //挂起调度器
     vTaskSuspendAll();
@@ -45,8 +44,7 @@ portTASK_FUNCTION(vImuSensorReadTask, pvParameters)
     xTaskResumeAll();
 
     xLastWakeTime = xTaskGetTickCount();
-    for(;;)
-    {
+    for (;;) {
         //读取加速度传感器
         AccSensorRead(accRawData);
         //读取陀螺仪传感器
@@ -55,9 +53,9 @@ portTASK_FUNCTION(vImuSensorReadTask, pvParameters)
         TempSensorRead(tempRawData);
 
         //更新消息队列，通知数据预处理任务对IMU数据进行预处理
-        xQueueSendToBack(messageQueue[ACC_SENSOR_READ],  (void *)&accRawData, 0);
-        xQueueSendToBack(messageQueue[GYRO_SENSOR_READ],  (void *)&gyroRawData, 0);
-        xQueueSendToBack(messageQueue[TEMP_SENSOR_READ],  (void *)&tempRawData, 0);
+        xQueueSendToBack(messageQueue[ACC_SENSOR_READ], (void *) &accRawData, 0);
+        xQueueSendToBack(messageQueue[GYRO_SENSOR_READ], (void *) &gyroRawData, 0);
+        xQueueSendToBack(messageQueue[TEMP_SENSOR_READ], (void *) &tempRawData, 0);
 
         //睡眠1ms
         vTaskDelayUntil(&xLastWakeTime, (1 / portTICK_RATE_MS));
@@ -70,8 +68,7 @@ portTASK_FUNCTION(vImuSensorReadTask, pvParameters)
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-portTASK_FUNCTION(vSensorUpdateTask, pvParameters)
-{
+portTASK_FUNCTION(vSensorUpdateTask, pvParameters) {
     portTickType xLastWakeTime;
     static uint16_t count = 0;
 
@@ -90,40 +87,35 @@ portTASK_FUNCTION(vSensorUpdateTask, pvParameters)
     GPSModuleInit();
 
     xLastWakeTime = xTaskGetTickCount();
-    for(;;)
-    {
+    for (;;) {
         //地磁传感器数据更新 100Hz
-        if(count % 2 == 0)
-        {
+        if (count % 2 == 0) {
             vTaskSuspendAll();
             MagSensorUpdate();
             xTaskResumeAll();
         }
 
         //气压传感器数据更新 50Hz
-        if(count % 4 == 0)
-        {
+        if (count % 4 == 0) {
             vTaskSuspendAll();
             BaroSensorUpdate();
             xTaskResumeAll();
         }
 
         //飞控参数保存(参数有更新才会执行）20Hz
-        if(count % 100 == 0)
-        {
+        if (count % 10 == 0) {
             ParamSaveToFlash();
         }
 
         //电池电压电流采样更新 200Hz
-        if(count % 20 == 0)
-        {
+        if (count % 20 == 0) {
             BatteryVoltageUpdate();
             BatteryCurrentUpdate();
         }
 
         //RGB闪烁
         RGB_Flash();
-        
+
         count++;
 
         //睡眠5ms
@@ -137,10 +129,11 @@ portTASK_FUNCTION(vSensorUpdateTask, pvParameters)
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-void ModuleTaskCreate(void)
-{
-    xTaskCreate(vImuSensorReadTask, "imuSensorRead", IMU_SENSOR_READ_TASK_STACK, NULL, IMU_SENSOR_READ_TASK_PRIORITY, &imuSensorReadTask);
-    xTaskCreate(vSensorUpdateTask, "sensorUpdate", SENSOR_UPDATE_TASK_STACK, NULL, SENSOR_UPDATE_TASK_PRIORITY, &sensorUpdateTask);
+void ModuleTaskCreate(void) {
+    xTaskCreate(vImuSensorReadTask, "imuSensorRead", IMU_SENSOR_READ_TASK_STACK, NULL, IMU_SENSOR_READ_TASK_PRIORITY,
+                &imuSensorReadTask);
+    xTaskCreate(vSensorUpdateTask, "sensorUpdate", SENSOR_UPDATE_TASK_STACK, NULL, SENSOR_UPDATE_TASK_PRIORITY,
+                &sensorUpdateTask);
 }
 
 
@@ -150,8 +143,7 @@ void ModuleTaskCreate(void)
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-int16_t	GetImuSensorReadTaskStackRemain(void)
-{
+int16_t GetImuSensorReadTaskStackRemain(void) {
     return uxTaskGetStackHighWaterMark(imuSensorReadTask);
 }
 
@@ -161,8 +153,7 @@ int16_t	GetImuSensorReadTaskStackRemain(void)
 *形    参: 无
 *返 回 值: 无
 **********************************************************************************************************/
-int16_t	GetSensorUpdateTaskStackRemain(void)
-{
+int16_t GetSensorUpdateTaskStackRemain(void) {
     return uxTaskGetStackHighWaterMark(sensorUpdateTask);
 }
 

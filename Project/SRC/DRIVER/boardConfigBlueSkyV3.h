@@ -22,6 +22,10 @@
 
 //#define USE_LOG
 
+// 遥控器协议选择
+#define USE_SBUS
+//#define USE_IBUS
+
 /**********************************************************************************************************
 *传感器安装方向
 **********************************************************************************************************/
@@ -60,7 +64,12 @@
 #define SBUS_UART            8              //SBUS接收机串口配置
 #define SBUS_BAUDRATE        100000
 
+#ifdef USE_SBUS
 #define SBUS_INV             1              //SBUS接收反向设置
+#else
+#define SBUS_INV             0
+#endif
+
 #define SBUS_INV_GPIO        GPIOB
 #define SBUS_INV_PIN         GPIO_PIN_9
 

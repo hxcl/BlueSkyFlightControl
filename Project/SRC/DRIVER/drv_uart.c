@@ -14,6 +14,7 @@
 #include "drv_uart.h"
 #include "string.h"
 #include "drv_sbus.h"
+#include "drv_ibus.h"
 #include "tfminiplus.h"
 #include "LC302.h"
 
@@ -81,7 +82,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         LC302_Decode(COM3RxBuf[0]);
         HAL_UART_Receive_IT(&COM3, COM3RxBuf, 1);
     } else if (huart == &COM5) {
+#ifdef USE_SBUS
         Sbus_Decode(COM5RxBuf[0]);
+#else
+        Ibus_Decode(COM5RxBuf[0]);
+#endif
         HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
     }
 }
