@@ -8,6 +8,7 @@
 #include "gyroscope.h"
 #include "ToF_altimeter.h"
 #include "navigation.h"
+#include "lowPassFilter.h"
 #include "LC302.h"
 #include "PX4FLOW.h"
 #include "board.h"
@@ -17,16 +18,12 @@
 typedef struct {
     float time_s;
     bool update_flag;
-    bool enable_lpf;
-
-    float Ref_gnd_vel_x;
-    float Ref_gnd_vel_y;
 
     float Velocity_x;
     float Velocity_y;
-
     float Velocity_x_lpf;
     float Velocity_y_lpf;
+
     float Gyro_x;
     float Gyro_y;
     float Gyro_x_phase;
@@ -37,6 +34,11 @@ typedef struct {
 
     float Velocity_uncoupled_lpf_x;
     float Velocity_uncoupled_lpf_y;
+
+    float Ref_gnd_vel_x;
+    float Ref_gnd_vel_y;
+    float RefGroundVelocityAccFilteredX;
+    float RefGroundVelocityAccFilteredY;
 
     float Position_x;
     float Position_y;
@@ -111,9 +113,14 @@ void OptFlowDataTreat(void) {
         optflow_manager.Ref_gnd_vel_x = optflow_manager.Velocity_uncoupled_lpf_x * Height;
         optflow_manager.Ref_gnd_vel_y = optflow_manager.Velocity_uncoupled_lpf_y * Height;
 
+        // 加速度补偿，tao参数根据截止频率求算，此处取约15Hz
+        LinearComplementaryFilter(0.01, 0.0208, GetCopterAccel().x, GetCopterAccel().y, optflow_manager.Ref_gnd_vel_x,
+                                    optflow_manager.Ref_gnd_vel_y, &(optflow_manager.RefGroundVelocityAccFilteredX),
+                                    &(optflow_manager.RefGroundVelocityAccFilteredY));
+
         //累计位移
-        optflow_manager.Gnd_Position_x += optflow_manager.Ref_gnd_vel_x * 0.0208f;
-        optflow_manager.Gnd_Position_y += optflow_manager.Ref_gnd_vel_y * 0.0208f;
+        optflow_manager.Gnd_Position_x += optflow_manager.RefGroundVelocityAccFilteredX * 0.0208f;
+        optflow_manager.Gnd_Position_y += optflow_manager.RefGroundVelocityAccFilteredY * 0.0208f;
 
         optflow_manager.update_flag = true;
     } else if (OPTFLOW_TYPE == PX4FLOW) {
@@ -160,11 +167,11 @@ float OptFlowGetGroundPositionY(void) {
 }
 
 float OptFlowGetGroundVelocityX(void) {
-    return optflow_manager.Ref_gnd_vel_x;
+    return optflow_manager.RefGroundVelocityAccFilteredX;
 }
 
 float OptFlowGetGroundVelocityY(void) {
-    return optflow_manager.Ref_gnd_vel_y;
+    return optflow_manager.RefGroundVelocityAccFilteredY;
 }
 
 // 光流调试时需要观察光流角速度和陀螺仪角速度之间的相位关系，因此提供以下四个函数
