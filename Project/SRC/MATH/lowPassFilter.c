@@ -63,7 +63,17 @@ Vector3f_t LowPassFilter2nd(LPF2ndData_t* lpf_2nd, Vector3f_t rawData)
     return lpf_2nd_data;
 }
 
-
+/**********************************************************************************************************
+*函 数 名: LinearComplementaryFilter
+*功能说明: 光流速度和加速度计加速度的一阶后向差分线性互补滤波，用于求取地理坐标系xy平面的速度，使用前确保坐标系一致
+*形    参: 时间常数 采样时间 xy轴加速度计的值（地理坐标系） xy轴光流速度（地理坐标系） xy轴速度（地理坐标系）
+*返 回 值: 经过滤波的x，y速度
+**********************************************************************************************************/
+void LinearComplementaryFilter(float tao, float samplingtime, float acc_x, float acc_y, float v_opt_x, float v_opt_y,
+                               float *v_x, float *v_y) {
+    *v_x = tao / (tao + samplingtime) * (*v_x + samplingtime * acc_x) + samplingtime / (tao + samplingtime) * v_opt_x;
+    *v_y = tao / (tao + samplingtime) * (*v_y + samplingtime * acc_y) + samplingtime / (tao + samplingtime) * v_opt_y;
+}
 
 
 
