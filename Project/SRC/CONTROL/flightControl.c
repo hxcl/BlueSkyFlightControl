@@ -46,7 +46,7 @@ void FlightControlInit(void) {
 
     fc.maxBrakeAngle = 10;
     fc.maxPosOuterCtl = 30;
-    fc.maxAltOuterCtl = 20;
+    fc.maxAltOuterCtl = 30;
 }
 
 /**********************************************************************************************************

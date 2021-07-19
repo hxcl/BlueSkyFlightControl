@@ -18,11 +18,11 @@
 #include "tfminiplus.h"
 #include "LC302.h"
 
-uint8_t COM1RxBuf[32];
-uint8_t COM2RxBuf[32];
-uint8_t COM3RxBuf[32];
-uint8_t COM4RxBuf[32];
-uint8_t COM5RxBuf[32];
+uint8_t COM1RxBuf[8];
+uint8_t COM2RxBuf[8];
+uint8_t COM3RxBuf[8];
+uint8_t COM4RxBuf[8];
+uint8_t COM5RxBuf[8];
 
 /**********************************************************************************************************
 *函 数 名: Uart_Open
@@ -59,7 +59,6 @@ void Uart_Init() {
 void Uart_SendData(uint8_t deviceNum, uint8_t *DataToSend, uint8_t length) {
     if (deviceNum == 1) {
         HAL_UART_Transmit_DMA(&COM1, DataToSend, length);
-        //HAL_UART_Transmit(&COM1, DataToSend, length, 100);
     } else if (deviceNum == 2) {
         HAL_UART_Transmit_DMA(&COM2, DataToSend, length);
     } else if (deviceNum == 3) {

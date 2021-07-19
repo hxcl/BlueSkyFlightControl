@@ -8,11 +8,9 @@
 #include "gyroscope.h"
 #include "ToF_altimeter.h"
 #include "navigation.h"
-#include "flightStatus.h"
 #include "LC302.h"
 #include "PX4FLOW.h"
 #include "board.h"
-#include "ahrs.h"
 
 #define USE_TOF_ALTITUDE
 
@@ -59,8 +57,9 @@ void OptFlowDataTreat(void) {
     static float gyro_phase_x = 0;
     static float gyro_phase_y = 0;
 
-    float temp_x_flow, temp_y_flow;
+    float temp_x_flow = 0, temp_y_flow = 0;
 
+    // 注意安装方向
     if (OPTFLOW_TYPE == LC302) {
         if (LC302_getAvaliable()) {
             temp_x_flow = (float) LC302_get_Y_Integral();
@@ -74,64 +73,47 @@ void OptFlowDataTreat(void) {
         float Height = ConstrainFloat(GetCopterPosition().z, 0, 500);
 
         // 角速度
-        optflow_manager.Velocity_x = -1 * temp_x_flow / 0.0208 / 10000.f;
-        optflow_manager.Velocity_y = temp_y_flow / 0.0208 / 10000.f;
+        optflow_manager.Velocity_x = -1.f * temp_x_flow / 0.0208f / 10000.f;
+        optflow_manager.Velocity_y = temp_y_flow / 0.0208f / 10000.f;
 
-        // 10Hz 低通，延时 0.02s
+        // 15Hz 低通，延时 0.02s
         optflow_manager.Velocity_x_lpf =
-                0.55674 * optflow_manager.Velocity_x + 0.44326 * optflow_manager.Velocity_x_lpf;
+                0.65326f * optflow_manager.Velocity_x + 0.34674f * optflow_manager.Velocity_x_lpf;
         optflow_manager.Velocity_y_lpf =
-                0.55674 * optflow_manager.Velocity_y + 0.44326 * optflow_manager.Velocity_y_lpf;
+                0.65326f * optflow_manager.Velocity_y + 0.34674f * optflow_manager.Velocity_y_lpf;
 
+        // 角速度是机体系（北东地）
         optflow_manager.Gyro_x = ConstrainFloat(Radians(GyroGetData().x), -100, 100);
         optflow_manager.Gyro_y = ConstrainFloat(Radians(GyroGetData().y), -100, 100);
 
         // 4Hz 低通，延时 0.02s
-        optflow_manager.Gyro_x_phase = (optflow_manager.Gyro_x * 0.334398 + optflow_manager.Gyro_x_phase * 0.665602);
-        optflow_manager.Gyro_y_phase = (optflow_manager.Gyro_y * 0.334398 + optflow_manager.Gyro_y_phase * 0.665602);
+        optflow_manager.Gyro_x_phase = (optflow_manager.Gyro_x * 0.334398f + optflow_manager.Gyro_x_phase * 0.665602f);
+        optflow_manager.Gyro_y_phase = (optflow_manager.Gyro_y * 0.334398f + optflow_manager.Gyro_y_phase * 0.665602f);
 
-        // 角度变化大时光流像素速度将较角速度大，缩放值须测试标定
-//        float gyroXScale = 1, gyroYScale = 1;
-//        int x = abs(GetAngleMeasure().x);
-//        if (x < 3) {
-//            gyroXScale = 0.9;
-//        } else if (x > 3 && x < 6) {
-//            gyroXScale = 1.4;
-//        } else {
-//            gyroXScale = 1.9;
-//        }
-//
-//        int y = abs(GetAngleMeasure().y);
-//        if (y < 3) {
-//            gyroYScale = 0.9;
-//        } else if (y > 3 && y < 6) {
-//            gyroYScale = 1.4;
-//        } else {
-//            gyroYScale = 1.9;
-//        }
-//
-//        optflow_manager.Gyro_x_phase = gyroXScale * optflow_manager.Gyro_x_phase;
-//        optflow_manager.Gyro_y_phase = gyroYScale * optflow_manager.Gyro_y_phase;
+        // 角速度缩放因子，需要标定得出
+        optflow_manager.Gyro_x_phase = 1.2f * optflow_manager.Gyro_x_phase;
+        optflow_manager.Gyro_y_phase = 1.2f * optflow_manager.Gyro_y_phase;
 
         //陀螺仪解耦合，单位是像素Pix单位时间内像素的位移
-        optflow_manager.Velocity_uncoupled_x = optflow_manager.Velocity_x_lpf + optflow_manager.Gyro_x_phase;
-        optflow_manager.Velocity_uncoupled_y = optflow_manager.Velocity_y_lpf + optflow_manager.Gyro_y_phase;
+        //补偿时的正负号和对应关系一定要结合坐标系、安装方向和调试结果来确定
+        optflow_manager.Velocity_uncoupled_x = optflow_manager.Velocity_x_lpf - optflow_manager.Gyro_y_phase;
+        optflow_manager.Velocity_uncoupled_y = optflow_manager.Velocity_y_lpf + optflow_manager.Gyro_x_phase;
 
         //光流速度限幅
         optflow_manager.Velocity_uncoupled_x = ConstrainFloat(optflow_manager.Velocity_uncoupled_x, -100.0f, 100.0f);
         optflow_manager.Velocity_uncoupled_y = ConstrainFloat(optflow_manager.Velocity_uncoupled_y, -100.0f, 100.0f);
 
         optflow_manager.Velocity_uncoupled_lpf_x =
-                optflow_manager.Velocity_uncoupled_lpf_x * 0.9 + optflow_manager.Velocity_uncoupled_x * 0.1;
+                optflow_manager.Velocity_uncoupled_lpf_x * 0.9f + optflow_manager.Velocity_uncoupled_x * 0.1f;
         optflow_manager.Velocity_uncoupled_lpf_y =
-                optflow_manager.Velocity_uncoupled_lpf_y * 0.9 + optflow_manager.Velocity_uncoupled_y * 0.1;
+                optflow_manager.Velocity_uncoupled_lpf_y * 0.9f + optflow_manager.Velocity_uncoupled_y * 0.1f;
 
         optflow_manager.Ref_gnd_vel_x = optflow_manager.Velocity_uncoupled_lpf_x * Height;
         optflow_manager.Ref_gnd_vel_y = optflow_manager.Velocity_uncoupled_lpf_y * Height;
 
         //累计位移
-        optflow_manager.Gnd_Position_x += optflow_manager.Ref_gnd_vel_x * 0.0208;
-        optflow_manager.Gnd_Position_y += optflow_manager.Ref_gnd_vel_y * 0.0208;
+        optflow_manager.Gnd_Position_x += optflow_manager.Ref_gnd_vel_x * 0.0208f;
+        optflow_manager.Gnd_Position_y += optflow_manager.Ref_gnd_vel_y * 0.0208f;
 
         optflow_manager.update_flag = true;
     } else if (OPTFLOW_TYPE == PX4FLOW) {
