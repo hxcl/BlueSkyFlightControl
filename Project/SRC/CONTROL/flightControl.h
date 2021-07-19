@@ -4,7 +4,7 @@
 #include "mathTool.h"
 #include "pid.h"
 
-#define MAXANGLE  90               //最大飞行角度：9°
+#define MAXANGLE  150               //最大飞行角度：150°
 #define MAXRCDATA 450
 
 enum

@@ -44,9 +44,9 @@ void FlightControlInit(void) {
         PIDWriteToFlash();
     }
 
-    fc.maxBrakeAngle = 10;
-    fc.maxPosOuterCtl = 30;
-    fc.maxAltOuterCtl = 30;
+    fc.maxBrakeAngle = 15;
+    fc.maxPosOuterCtl = 100;
+    fc.maxAltOuterCtl = 50;
 }
 
 /**********************************************************************************************************
@@ -233,14 +233,14 @@ void AttitudeOuterControl(void) {
         attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -200, 200);
         attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -200, 200);
     } else if (GetPosControlStatus() == POS_CHANGED) {
-        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -50, 50);
-        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -50, 50);
+        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -100, 100);
+        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -100, 100);
     } else if (GetPosControlStatus() == POS_BRAKE) {
-        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -50, 50);
-        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -50, 50);
+        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -100, 100);
+        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -100, 100);
     } else {
-        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -50, 50);
-        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -50, 50);
+        attOuterCtlValue.x = ConstrainFloat(attOuterCtlValue.x, -100, 100);
+        attOuterCtlValue.y = ConstrainFloat(attOuterCtlValue.y, -100, 100);
     }
 
     //若航向锁定被失能则直接将摇杆数值作为目标角速度
@@ -354,8 +354,8 @@ void PositionInnerControl(void) {
         posInnerCtlOutput.x = ConstrainFloat(posInnerCtlOutput.x, -fc.maxBrakeAngle, fc.maxBrakeAngle);
         posInnerCtlOutput.y = ConstrainFloat(posInnerCtlOutput.y, -fc.maxBrakeAngle, fc.maxBrakeAngle);
     } else {
-        posInnerCtlOutput.x = ConstrainFloat(posInnerCtlOutput.x, -15, 15);
-        posInnerCtlOutput.y = ConstrainFloat(posInnerCtlOutput.y, -15, 15);
+        posInnerCtlOutput.x = ConstrainFloat(posInnerCtlOutput.x, -25, 25);
+        posInnerCtlOutput.y = ConstrainFloat(posInnerCtlOutput.y, -25, 25);
     }
 
     //将位置内环控制量作为姿态外环的控制目标

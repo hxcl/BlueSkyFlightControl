@@ -105,16 +105,16 @@ void AutoLand(void)
     //更新高度控制状态
     SetAltControlStatus(ALT_CHANGED);
 
-    //减速降落
+    //减速降落速度不应过低，以免低高度下位置发生漂移
     //在没有对地测距传感器的情况下，只能大致判断高度，提前进行减速
     if(alttitude < 10){
-        velCtlTarget = -3.f;
+        velCtlTarget = -10.f;
     }
-    else if(alttitude < 64){
-        velCtlTarget = -0.5f * alttitude + 2;
+    else if(alttitude < 60){
+        velCtlTarget = -1.f * alttitude;
     }
     else if(alttitude < 200){
-        velCtlTarget = velCtlTarget * 0.99f - 30.0f * 0.01f;
+        velCtlTarget = velCtlTarget * 0.75f - 60.0f * 0.25f;
     }
     else if(alttitude < 500)
     {
@@ -134,7 +134,7 @@ void AutoLand(void)
     }
 
     //更新高度内环控制目标，速度限幅提高观感和安全性
-    velCtlTarget = ConstrainFloat(velCtlTarget, -10, 10);
+    velCtlTarget = ConstrainFloat(velCtlTarget, -60, 60);
     SetAltInnerCtlTarget(velCtlTarget);
 }
 

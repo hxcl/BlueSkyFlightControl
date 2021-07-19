@@ -266,10 +266,10 @@ void SystemClock_Config(void)
                               |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_SPI6
                               |RCC_PERIPHCLK_I2C4|RCC_PERIPHCLK_USB;
   PeriphClkInitStruct.PLL2.PLL2M = 25;
-  PeriphClkInitStruct.PLL2.PLL2N = 240;
-  PeriphClkInitStruct.PLL2.PLL2P = 2;
+  PeriphClkInitStruct.PLL2.PLL2N = 216;
+  PeriphClkInitStruct.PLL2.PLL2P = 6;
   PeriphClkInitStruct.PLL2.PLL2Q = 2;
-  PeriphClkInitStruct.PLL2.PLL2R = 10;
+  PeriphClkInitStruct.PLL2.PLL2R = 3;
   PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_0;
   PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
   PeriphClkInitStruct.PLL2.PLL2FRACN = 0;

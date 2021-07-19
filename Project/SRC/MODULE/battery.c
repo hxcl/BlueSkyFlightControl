@@ -12,9 +12,9 @@
 #include "battery.h"
 #include "drv_adc.h"
 
-// 一般建议锂电池在 3.7V 充电，现有电压测量体系大概有 0.4V 的负误差
-#define VOLTAGE_LOW            360 * 3
-#define VOLTAGE_CRITICAL_LOW   340 * 3
+// 一般建议锂电池在 3.7V 充电
+#define VOLTAGE_LOW            370 * 3
+#define VOLTAGE_CRITICAL_LOW   350 * 3
 
 static float batVoltage;
 static float batCurrent;
