@@ -68,8 +68,8 @@ void RcInit(void)
     rcData.aux12    = 1500;
 
     //设置各辅助通道对应的飞行模式
-    rcAuxMode[AUX1][LOW]  = MANUAL;
-    rcAuxMode[AUX1][MID]  = SEMIAUTO;
+    rcAuxMode[AUX1][LOW]  = AUTOLAND;
+    rcAuxMode[AUX1][MID]  = AUTOTAKEOFF;
     rcAuxMode[AUX1][HIGH] = AUTO;
 
     rcAuxMode[AUX2][LOW]  = 0xFF;//AUTO;
@@ -468,6 +468,13 @@ void FlightStatusUpdate(void)
             }
         }
 
+        //自动起飞模式下，解锁后直接跳转起飞模式
+        if(GetArmedStatus() == ARMED){
+            if(GetFlightMode() == AUTOTAKEOFF){
+                SetFlightStatus(TAKE_OFF);
+            }
+        }
+
         //控制相关复位
         FlightControlReset();
     }
@@ -477,10 +484,15 @@ void FlightStatusUpdate(void)
         //判断垂直速度大于一定值则进入空中状态
         //后面有时间再慢慢优化起飞步骤，把起飞操作变成一个半自动过程，改善飞行体验
         //因为对于一个完全没有接触过飞机的人来说，手动起飞可能会出现各种意外（比如摇杆往上拨了一点点就立马收油）
-        if(GetCopterVelocity().z > 5)
+        if(GetCopterVelocity().z > 5) {
             SetFlightStatus(IN_AIR);
-        else if(rcData.throttle < MINCHECK)
+        }
+        else if(rcData.throttle < MINCHECK && GetFlightMode()!=AUTOTAKEOFF) {
             SetFlightStatus(STANDBY);
+        }
+        else if(GetFlightMode() == AUTOTAKEOFF) {
+            SetFlightStatus(IN_AIR);
+        }
     }
     /********************************************空中***********************************************/
     else if(GetFlightStatus() == IN_AIR)
@@ -494,7 +506,7 @@ void FlightStatusUpdate(void)
             if(rcData.throttle < MIDCHECK)
                 SetFlightStatus(LANDING);
         }
-        else if(rcData.throttle < MIDCHECK && GetAltControlStatus() == ALT_CHANGED)
+        else if(rcData.throttle < MIDCHECK && GetAltControlStatus() == ALT_CHANGED && GetFlightMode() != AUTOTAKEOFF)
         {
             SetFlightStatus(LANDING);
         }
@@ -517,57 +529,53 @@ void FlightStatusUpdate(void)
                 SetFlightStatus(IN_AIR);
         }
 
-        if(GetCopterPosition().z < 5){
+        // 当能够获得准确的高度测量值时使用高度和z轴速度判断降落完成
+        if(GetCopterPosition().z <= 5 && GetCopterVelocity().z <= 0.5){
             SetFlightStatus(FINISH_LANDING);
         }
         //降落检测实现比较麻烦，因为要保证安全（不出现误检测）的同时要提升检测的速度（落地后能够立即完成检测）
         //目前的检测方式为检测垂直方向的控制误差超过一定值并持续一定时间便认为已落地
         //通过检测落地时产生的震动来加快检测
         //在有TOF或超声波等对地测距方式时，再额外添加检测方式
-
-        //加速度模值微分值大小超过一定值时认为检测到震动
-//        if()
-//            landVibraFlag = 1;
-
-        if(GetFlightMode() != MANUAL && landVibraFlag && abs(GetPosInnerCtlError().z) > 35 &&
-                abs(GetCopterVelocity().z) < 100 && abs(GetAccMag() - 1) < 0.1f)
-        {
-            if(GetSysTimeMs() - landCheckTime[0] > 1000)
-                SetFlightStatus(FINISH_LANDING);
-        }
-        else
-            landCheckTime[0] = GetSysTimeMs();
-
-        if(GetFlightMode() == MANUAL)           //手动模式
-        {
-            if(rcData.throttle < MINCHECK && abs(GetCopterVelocity().z) < 80)
-            {
-                if(GetSysTimeMs() - landCheckTime[3] > 2000)
-                    SetFlightStatus(FINISH_LANDING);
-            }
-            else
-                landCheckTime[3] = GetSysTimeMs();
-        }
-        else if(GetFlightMode() == AUTOLAND)    //自动降落模式
-        {
-            if(abs(GetPosInnerCtlError().z) > 50 && abs(GetCopterVelocity().z) < 50)
-            {
-                if(GetSysTimeMs() - landCheckTime[2] > 2000)
-                    SetFlightStatus(FINISH_LANDING);
-            }
-            else
-                landCheckTime[2] = GetSysTimeMs();
-        }
-        else                                    //其它模式
-        {
-            if(rcData.throttle < MINCHECK && abs(GetPosInnerCtlError().z) > 200 && abs(GetCopterVelocity().z) < 50)
-            {
-                if(GetSysTimeMs() - landCheckTime[3] > 2000)
-                    SetFlightStatus(FINISH_LANDING);
-            }
-            else
-                landCheckTime[3] = GetSysTimeMs();
-        }
+//        if(GetFlightMode() != MANUAL && landVibraFlag && abs(GetPosInnerCtlError().z) > 35 &&
+//                abs(GetCopterVelocity().z) < 100 && abs(GetAccMag() - 1) < 0.1f)
+//        {
+//            if(GetSysTimeMs() - landCheckTime[0] > 1000)
+//                SetFlightStatus(FINISH_LANDING);
+//        }
+//        else
+//            landCheckTime[0] = GetSysTimeMs();
+//
+//        if(GetFlightMode() == MANUAL)           //手动模式
+//        {
+//            if(rcData.throttle < MINCHECK && abs(GetCopterVelocity().z) < 80)
+//            {
+//                if(GetSysTimeMs() - landCheckTime[3] > 2000)
+//                    SetFlightStatus(FINISH_LANDING);
+//            }
+//            else
+//                landCheckTime[3] = GetSysTimeMs();
+//        }
+//        else if(GetFlightMode() == AUTOLAND)    //自动降落模式
+//        {
+//            if(abs(GetPosInnerCtlError().z) > 50 && abs(GetCopterVelocity().z) < 50)
+//            {
+//                if(GetSysTimeMs() - landCheckTime[2] > 2000)
+//                    SetFlightStatus(FINISH_LANDING);
+//            }
+//            else
+//                landCheckTime[2] = GetSysTimeMs();
+//        }
+//        else                                    //其它模式
+//        {
+//            if(rcData.throttle < MINCHECK && abs(GetPosInnerCtlError().z) > 200 && abs(GetCopterVelocity().z) < 50)
+//            {
+//                if(GetSysTimeMs() - landCheckTime[3] > 2000)
+//                    SetFlightStatus(FINISH_LANDING);
+//            }
+//            else
+//                landCheckTime[3] = GetSysTimeMs();
+//        }
     }
     /*******************************************降落完成**********************************************/
     else if(GetFlightStatus() == FINISH_LANDING)

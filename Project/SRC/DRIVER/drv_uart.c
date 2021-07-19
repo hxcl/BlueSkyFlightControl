@@ -14,14 +14,15 @@
 #include "drv_uart.h"
 #include "string.h"
 #include "drv_sbus.h"
+#include "drv_ibus.h"
 #include "tfminiplus.h"
 #include "LC302.h"
 
-uint8_t COM1RxBuf[32];
-uint8_t COM2RxBuf[32];
-uint8_t COM3RxBuf[32];
-uint8_t COM4RxBuf[32];
-uint8_t COM5RxBuf[32];
+uint8_t COM1RxBuf[8];
+uint8_t COM2RxBuf[8];
+uint8_t COM3RxBuf[8];
+uint8_t COM4RxBuf[8];
+uint8_t COM5RxBuf[8];
 
 /**********************************************************************************************************
 *函 数 名: Uart_Open
@@ -58,7 +59,6 @@ void Uart_Init() {
 void Uart_SendData(uint8_t deviceNum, uint8_t *DataToSend, uint8_t length) {
     if (deviceNum == 1) {
         HAL_UART_Transmit_DMA(&COM1, DataToSend, length);
-        //HAL_UART_Transmit(&COM1, DataToSend, length, 100);
     } else if (deviceNum == 2) {
         HAL_UART_Transmit_DMA(&COM2, DataToSend, length);
     } else if (deviceNum == 3) {
@@ -81,7 +81,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         LC302_Decode(COM3RxBuf[0]);
         HAL_UART_Receive_IT(&COM3, COM3RxBuf, 1);
     } else if (huart == &COM5) {
+#ifdef USE_SBUS
         Sbus_Decode(COM5RxBuf[0]);
+#else
+        Ibus_Decode(COM5RxBuf[0]);
+#endif
         HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
     }
 }
