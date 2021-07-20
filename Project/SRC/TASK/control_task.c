@@ -14,6 +14,7 @@
 #include "flightControl.h"
 #include "userControl.h"
 #include "missionControl.h"
+#include "commandControl.h"
 #include "safeControl.h"
 #include "rc.h"
 
@@ -66,6 +67,9 @@ portTASK_FUNCTION(vFlightControlTask, pvParameters)
 
             //自主控制任务实现（自动起飞、自动降落、自动返航、自动航线等）
             MissionControl();
+
+            //命令控制
+            CommandControl();
 
             //位置内环控制
             PositionInnerControl();

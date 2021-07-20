@@ -174,7 +174,7 @@ float OptFlowGetGroundVelocityY(void) {
     return optflow_manager.RefGroundVelocityAccFilteredY;
 }
 
-// 光流调试时需要观察光流角速度和陀螺仪角速度之间的相位关系，因此提供以下四个函数
+// 光流调试时需要观察光流角速度和陀螺仪角速度之间的关系，因此提供以下四个函数
 float OptFlowGetLPFVelocityX(void) {
     return optflow_manager.Velocity_x_lpf;
 }

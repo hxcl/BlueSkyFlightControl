@@ -87,7 +87,7 @@ void MissionControl(void)
 void AutoLand(void)
 {
     static float velCtlTarget = 0;
-    float alttitude = GetCopterPosition().z;
+    float altitude = GetCopterPosition().z;
 
     //使能航向锁定
     SetYawHoldStatus(ENABLE);
@@ -107,24 +107,21 @@ void AutoLand(void)
 
     //减速降落速度不应过低，以免低高度下位置发生漂移
     //在没有对地测距传感器的情况下，只能大致判断高度，提前进行减速
-    if(alttitude < 10){
-        velCtlTarget = -10.f;
+    if(altitude < 5){
+        velCtlTarget = -25.f;
     }
-    else if(alttitude < 60){
-        velCtlTarget = -1.f * alttitude;
+    else if(altitude < 40){
+        velCtlTarget = -1.f * altitude - 30.f;
     }
-    else if(alttitude < 200){
-        velCtlTarget = velCtlTarget * 0.75f - 60.0f * 0.25f;
-    }
-    else if(alttitude < 500)
+    else if(altitude < 500)
     {
         velCtlTarget = velCtlTarget * 0.99f - 70.0f * 0.01f;
     }
-    else if(alttitude < 1000)
+    else if(altitude < 1000)
     {
         velCtlTarget = velCtlTarget * 0.99f - 80.0f * 0.01f;
     }
-    else if(alttitude < 5000)
+    else if(altitude < 5000)
     {
         velCtlTarget = velCtlTarget * 0.99f - 200.0f * 0.01f;
     }
@@ -138,20 +135,33 @@ void AutoLand(void)
     SetAltInnerCtlTarget(velCtlTarget);
 }
 
+/**********************************************************************************************************
+*函 数 名: AutoTakeOff
+*功能说明: 自动起飞
+*形    参: 无
+*返 回 值: 无
+**********************************************************************************************************/
 void AutoTakeOff(void)
 {
+    static float yawHold;
     // 高度控制目标
-    static float AltCtlTarget = 30;
-    float alttitude = GetCopterPosition().z;
+    static float AltCtlTarget = 60;
+    float altitude = GetCopterPosition().z;
+
+    static bool FinishTakeOff;
+    static uint32_t FinishTakeOffTime;
 
     // 待机模式刷新目标位置
     if(GetFlightStatus() == STANDBY)
     {
         posCtlTarget.x = GetCopterPosition().x;
         posCtlTarget.y = GetCopterPosition().y;
+
+        yawHold = GetCopterAngle().z;
     }
 
-    //使能航向锁定
+    //设置航向锁定目标角度，使能航向锁定
+    SetYawCtlTarget(yawHold);
     SetYawHoldStatus(ENABLE);
 
     //使能位置控制
@@ -170,11 +180,26 @@ void AutoTakeOff(void)
     //更新高度外环控制目标
     SetAltOuterCtlTarget(AltCtlTarget);
 
-    float err = (alttitude>AltCtlTarget)?(alttitude-AltCtlTarget):(AltCtlTarget-alttitude);
+    float err = (altitude>AltCtlTarget)?(altitude-AltCtlTarget):(AltCtlTarget-altitude);
+
+    uint32_t NowTimeMs = GetSysTimeMs();
 
     if(err < 5){
         SetAltControlStatus(ALT_HOLD);
-        SetFlightMode(AUTOLAND);
+        if(FinishTakeOff == false){
+            FinishTakeOff = true;
+            FinishTakeOffTime = NowTimeMs;
+        }
+        else if(FinishTakeOffTime == true){
+            if((NowTimeMs - FinishTakeOffTime)>5000){
+                SetFlightMode(AUTOLAND);
+                //SetFlightMode(COMMAND);
+            }
+        }
+    }else{
+        SetAltControlStatus(ALT_CHANGED);
+        FinishTakeOff = false;
+        FinishTakeOffTime = NowTimeMs;
     }
 }
 
@@ -383,7 +408,4 @@ void ReturnToHome(void)
         SetFlightMode(AUTOLAND);
     }
 }
-
-
-
 

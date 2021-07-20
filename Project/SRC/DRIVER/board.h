@@ -86,12 +86,13 @@ enum {
 };
 
 enum {
-    TFMINIPLUS
+    TFMINIPLUS,
+    VL53Lxx   //Not support now
 };
 
 enum {
     LC302,
-    VLX53xx,
+    PWM3901,  //Not support now
     PX4FLOW
 };
 

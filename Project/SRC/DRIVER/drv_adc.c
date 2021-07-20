@@ -53,7 +53,7 @@ uint16_t GetVoltageAdcValue(void)
     HAL_ADC_PollForConversion(&ADC_VOLTAGE, 1);
     adcTemp = HAL_ADC_GetValue(&ADC_VOLTAGE);
 
-    return (adcTemp * 330 / 0xFFFF);
+    return (adcTemp * 330 / 0xFFF);
 }
 
 /**********************************************************************************************************
@@ -70,7 +70,7 @@ uint16_t GetCurrentAdcValue(void)
     HAL_ADC_PollForConversion(&ADC_CURRENT, 1);
     adcTemp = HAL_ADC_GetValue(&ADC_CURRENT);
 
-    return (adcTemp * 330 / 0xFFFF);
+    return (adcTemp * 330 / 0xFFF);
 }
 
 

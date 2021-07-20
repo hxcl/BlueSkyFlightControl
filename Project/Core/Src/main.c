@@ -39,6 +39,7 @@
 #include "motor.h"
 #include "drv_uart.h"
 #include "tim.h"
+#include "accelerometer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -122,6 +123,9 @@ portTASK_FUNCTION(vStartTask, pvParameters) {
     FaultDetectInit();
 
     MessageQueueCreate();
+
+    //上电计算水平安装误差
+    LevelCalibrateEnable();
 
 #ifdef GET_RUNTIME_STATS
     xTaskCreate(run_time_task,"RunTimeTask",512,NULL,13,& RunTimeStatsTask);
