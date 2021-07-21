@@ -320,33 +320,3 @@ float spl06007_get_pressure(void) {
     //fPCompensate = p_spl06007->calib_param.c00 + fPsc * qua2 + 0.9f *fTsc  * p_spl06007->calib_param.c01 + qua3;
     return fPCompensate;
 }
-
-//float temperature;
-//float pressure;
-//extern uint16_t_t calibratingB;
-//float logBaroGroundPressureSum;
-//float baroGroundTemperatureScale;
-//int16_t_t BaroAlt;
-//float Tempbaro;
-//float user_spl06007_get()
-//{
-//
-//    spl06007_get_raw_temp();
-//    temperature = spl06007_get_temperature();
-//
-//    spl06007_get_raw_pressure();
-//    pressure = spl06007_get_pressure()*10;
-//
-//    if(calibratingB > 0) {
-//        logBaroGroundPressureSum = pressure;
-//        calibratingB--;
-//    }
-//    BaroAlt = BaroAlt*6+(logBaroGroundPressureSum-pressure)*2;
-//    BaroAlt>>=3;
-//    alt.EstAlt=BaroAlt;
-//    //Tempbaro=(float)(pressure/logBaroGroundPressureSum)*1.0;
-//    // BaroAlt = 4433000.0f * (1 - powf((float)(Tempbaro),0.190295f));
-//
-//    //printf("%f,%f,%d\r\n",temperature,pressure,BaroAlt);
-//    return 0;
-//}

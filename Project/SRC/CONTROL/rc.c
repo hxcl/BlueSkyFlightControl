@@ -11,8 +11,6 @@
 **********************************************************************************************************/
 #include "rc.h"
 #include "flightStatus.h"
-#include "drv_sbus.h"
-#include "accelerometer.h"
 #include "magnetometer.h"
 #include "navigation.h"
 #include "flightControl.h"
@@ -440,6 +438,10 @@ void FlightStatusUpdate(void)
                 if(rcData.throttle > MINCHECK)
                     SetFlightStatus(TAKE_OFF);
             }
+            //自动起飞模式下，解锁后直接跳转起飞模式
+            else if(GetFlightMode() == AUTOTAKEOFF){
+                SetFlightStatus(TAKE_OFF);
+            }
             else
             {
                 if(rcData.throttle > MIDCHECK && GetAltControlStatus() == ALT_CHANGED)
@@ -454,6 +456,10 @@ void FlightStatusUpdate(void)
             {
                 SetArmedStatus(DISARMED);
             }
+            //命令控制模式下，解锁后保持解锁状态，等待起飞模式跳转到起飞状态
+            else if(GetFlightMode() == COMMAND){
+                SetArmedStatus(ARMED);
+            }
             else
             {
                 if(rcData.throttle < MINCHECK && abs(rcData.yaw - MIDCHECK) < 50 && !armedCheckFlag)
@@ -465,13 +471,6 @@ void FlightStatusUpdate(void)
                 {
                     disArmedCheckTime = GetSysTimeMs();
                 }
-            }
-        }
-
-        //自动起飞模式下，解锁后直接跳转起飞模式
-        if(GetArmedStatus() == ARMED){
-            if(GetFlightMode() == AUTOTAKEOFF){
-                SetFlightStatus(TAKE_OFF);
             }
         }
 
@@ -506,18 +505,10 @@ void FlightStatusUpdate(void)
             if(rcData.throttle < MIDCHECK)
                 SetFlightStatus(LANDING);
         }
-        else if(rcData.throttle < MIDCHECK && GetAltControlStatus() == ALT_CHANGED && GetFlightMode() != AUTOTAKEOFF)
+        else if(rcData.throttle < MIDCHECK && GetAltControlStatus() == ALT_CHANGED&& GetFlightMode() != AUTOTAKEOFF && GetFlightMode() != COMMAND)
         {
             SetFlightStatus(LANDING);
         }
-
-        //重置落地震动检测标志位
-        landVibraFlag = 0;
-
-        landCheckTime[0] = GetSysTimeMs();
-        landCheckTime[1] = GetSysTimeMs();
-        landCheckTime[2] = GetSysTimeMs();
-        landCheckTime[3] = GetSysTimeMs();
     }
     /********************************************降落***********************************************/
     else if(GetFlightStatus() == LANDING)
@@ -533,49 +524,6 @@ void FlightStatusUpdate(void)
         if(GetCopterPosition().z <= 5 && GetCopterVelocity().z <= 0.5){
             SetFlightStatus(FINISH_LANDING);
         }
-        //降落检测实现比较麻烦，因为要保证安全（不出现误检测）的同时要提升检测的速度（落地后能够立即完成检测）
-        //目前的检测方式为检测垂直方向的控制误差超过一定值并持续一定时间便认为已落地
-        //通过检测落地时产生的震动来加快检测
-        //在有TOF或超声波等对地测距方式时，再额外添加检测方式
-//        if(GetFlightMode() != MANUAL && landVibraFlag && abs(GetPosInnerCtlError().z) > 35 &&
-//                abs(GetCopterVelocity().z) < 100 && abs(GetAccMag() - 1) < 0.1f)
-//        {
-//            if(GetSysTimeMs() - landCheckTime[0] > 1000)
-//                SetFlightStatus(FINISH_LANDING);
-//        }
-//        else
-//            landCheckTime[0] = GetSysTimeMs();
-//
-//        if(GetFlightMode() == MANUAL)           //手动模式
-//        {
-//            if(rcData.throttle < MINCHECK && abs(GetCopterVelocity().z) < 80)
-//            {
-//                if(GetSysTimeMs() - landCheckTime[3] > 2000)
-//                    SetFlightStatus(FINISH_LANDING);
-//            }
-//            else
-//                landCheckTime[3] = GetSysTimeMs();
-//        }
-//        else if(GetFlightMode() == AUTOLAND)    //自动降落模式
-//        {
-//            if(abs(GetPosInnerCtlError().z) > 50 && abs(GetCopterVelocity().z) < 50)
-//            {
-//                if(GetSysTimeMs() - landCheckTime[2] > 2000)
-//                    SetFlightStatus(FINISH_LANDING);
-//            }
-//            else
-//                landCheckTime[2] = GetSysTimeMs();
-//        }
-//        else                                    //其它模式
-//        {
-//            if(rcData.throttle < MINCHECK && abs(GetPosInnerCtlError().z) > 200 && abs(GetCopterVelocity().z) < 50)
-//            {
-//                if(GetSysTimeMs() - landCheckTime[3] > 2000)
-//                    SetFlightStatus(FINISH_LANDING);
-//            }
-//            else
-//                landCheckTime[3] = GetSysTimeMs();
-//        }
     }
     /*******************************************降落完成**********************************************/
     else if(GetFlightStatus() == FINISH_LANDING)

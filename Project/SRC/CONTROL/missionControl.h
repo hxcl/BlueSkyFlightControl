@@ -13,6 +13,16 @@ enum
     RTH_STEP_LOITER
 };
 
+// 命令流程
+enum
+{
+    WaitArm= 0,
+    InTakeOff,
+    FlightWithCommand,
+    InLanding,
+    WaitDisarm
+};
+
 void MissionControl(void);
 
 #endif

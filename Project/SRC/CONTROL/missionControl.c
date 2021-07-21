@@ -13,19 +13,23 @@
 #include "waypointControl.h"
 #include "flightStatus.h"
 #include "flightControl.h"
+#include "commandControl.h"
 #include "board.h"
 #include "navigation.h"
 #include "ahrs.h"
 #include "gps.h"
 
 static Vector3f_t posCtlTarget;
+static float yawHold;
 
 uint8_t rthStep;
+uint8_t commandStep;
 static float rthHeight   = 3000;  //预设返航高度 单位：cm
 static float rthWaitTime = 2000;  //返航回到Home点后的悬停等待时间 单位：ms
 
 void AutoLand(void);
 void AutoTakeOff(void);
+void CommandFlight();
 void ReturnToHome(void);
 
 /**********************************************************************************************************
@@ -54,6 +58,9 @@ void MissionControl(void)
     else if(flightMode == AUTOTAKEOFF){
         AutoTakeOff();
     }
+    else if(flightMode == COMMAND){
+        CommandFlight();
+    }
     else if(flightMode == RETURNTOHOME)
     {
         //自动返航
@@ -72,9 +79,131 @@ void MissionControl(void)
     {
         //在非任务控制模式下，更新当前位置目标
         posCtlTarget = GetCopterPosition();
+        yawHold = GetCopterAngle().z;
 
+        //命令流程复位
+        commandStep = 0;
         //返航步骤标志位复位
         rthStep = 0;
+    }
+}
+
+// 命令模式使用流程管理，
+// 流程命令分为五种：解锁、起飞、命令控制、降落和上锁，对应五段流程：待解锁阶段、起飞阶段、命令控制阶段、降落阶段、待上锁阶段
+void CommandFlight(){
+    static bool ChangedFlagX, ChangedFlagY, ChangedFlagZ = false;
+    Vector3f_t posNow = GetCopterPosition();
+
+    switch (commandStep) {
+        case WaitArm:{
+            if(command.ArmFlag == 1){
+                command.ArmFlag = 0;
+                SetArmedStatus(ARMED);
+                //向上位机报告解锁完成
+                CommandFeedback(FINISH_ARM_FEEDBACK);
+                commandStep++;
+            }
+        }
+        case InTakeOff:{
+            if(command.TakeOffFlag == 1){
+                command.TakeOffFlag = 0;
+                //交由自动起飞模式控制起飞
+                SetFlightMode(AUTOTAKEOFF);
+                //向上位机报告开始起飞
+                CommandFeedback(START_TAKEOFF_FEEDBACK);
+                commandStep++;
+            }
+        }
+        case FlightWithCommand:{
+            if(command.PositionHoldFlag == 1){
+                command.PositionHoldFlag = 0;
+                posCtlTarget = posNow;
+                SetPosControlStatus(POS_HOLD);
+                SetPosOuterCtlTarget(posCtlTarget);
+                CommandFeedback(FINISH_POSITION_HOLD);
+            }
+
+            if(command.PositionXChangeFlag == 1){
+                command.PositionXChangeFlag = 0;
+                posCtlTarget.x += command.PositionXChange;
+                command.PositionXChange = 0;
+                SetPosControlStatus(POS_CHANGED);
+                SetPosOuterCtlTarget(posCtlTarget);
+                ChangedFlagX = true;
+            }
+            //暂时只考虑每次改变一个轴的情况
+            if(ChangedFlagX == true){
+                float errX = posNow.x>posCtlTarget.x?(posNow.x-posCtlTarget.x):(posCtlTarget.x-posNow.x);
+                if(errX < 3){
+                    //移动已完成
+                    CommandFeedback(FINISH_MOVE_X_FEEDBACK);
+                    SetPosControlStatus(POS_HOLD);
+                    ChangedFlagX = false;
+                }
+            }
+
+            if(command.PositionYChangeFlag == 1){
+                command.PositionYChangeFlag = 0;
+                posCtlTarget.y += command.PositionYChange;
+                command.PositionXChange = 0;
+                SetPosControlStatus(POS_CHANGED);
+                SetPosOuterCtlTarget(posCtlTarget);
+                ChangedFlagY = true;
+            }
+            if(ChangedFlagY == true){
+                float errY = posNow.y>posCtlTarget.y?(posNow.y-posCtlTarget.y):(posCtlTarget.y-posNow.y);
+                if(errY < 3){
+                    //移动已完成
+                    CommandFeedback(FINISH_MOVE_Y_FEEDBACK);
+                    SetPosControlStatus(POS_HOLD);
+                    ChangedFlagY = false;
+                }
+            }
+
+            if(command.PositionZChangeFlag == 1){
+                command.PositionZChangeFlag = 0;
+                posCtlTarget.z += command.PositionZChange;
+                command.PositionZChange = 0;
+                SetAltControlStatus(ALT_CHANGED);
+                SetAltOuterCtlTarget(posCtlTarget.z);
+                ChangedFlagZ = true;
+            }
+            if(ChangedFlagZ == true){
+                float errZ = posNow.z>posCtlTarget.z?(posNow.z-posCtlTarget.z):(posCtlTarget.z-posNow.z);
+                if(errZ < 3){
+                    //移动已完成
+                    CommandFeedback(FINISH_MOVE_Z_FEEDBACK);
+                    SetPosControlStatus(POS_HOLD);
+                    ChangedFlagZ = false;
+                }
+            }
+
+            if(command.LandFlag == 1){
+                command.LandFlag = 0;
+                //收到降落指令后跳转降落阶段
+                commandStep++;
+            }
+        }
+        case InLanding:{
+            //降落命令的执行与其他模式稍有不同，当飞控处于命令飞行阶段时，上位机下达降落命令后才前进到降落阶段，因此直接执行
+            //交由自动降落模式降落
+            SetFlightMode(AUTOLAND);
+            //向上位机报告开始降落
+            CommandFeedback(START_LAND_FEEDBACK);
+            commandStep++;
+        }
+        case WaitDisarm:{
+            if(command.DisarmFlag == 1){
+                command.DisarmFlag = 0;
+                SetArmedStatus(DISARMED);
+                //向上位机报告降落完成
+                CommandFeedback(FINISH_DISARM_FEEDBACK);
+                commandStep = 0;
+            }
+        }
+        default:{
+
+        }
     }
 }
 
@@ -108,10 +237,10 @@ void AutoLand(void)
     //减速降落速度不应过低，以免低高度下位置发生漂移
     //在没有对地测距传感器的情况下，只能大致判断高度，提前进行减速
     if(altitude < 5){
-        velCtlTarget = -25.f;
+        velCtlTarget = -20.f;
     }
-    else if(altitude < 40){
-        velCtlTarget = -1.f * altitude - 30.f;
+    else if(altitude < 55){
+        velCtlTarget = -1.f * altitude - 15.f;
     }
     else if(altitude < 500)
     {
@@ -133,6 +262,13 @@ void AutoLand(void)
     //更新高度内环控制目标，速度限幅提高观感和安全性
     velCtlTarget = ConstrainFloat(velCtlTarget, -60, 60);
     SetAltInnerCtlTarget(velCtlTarget);
+
+    if(GetCopterVelocity().z == 0) {
+        //通知上位机降落完成
+        CommandFeedback(FINISH_LAND_FEEDBACK);
+        //将控制权交还命令模式
+        SetFlightMode(COMMAND);
+    }
 }
 
 /**********************************************************************************************************
@@ -143,7 +279,6 @@ void AutoLand(void)
 **********************************************************************************************************/
 void AutoTakeOff(void)
 {
-    static float yawHold;
     // 高度控制目标
     static float AltCtlTarget = 60;
     float altitude = GetCopterPosition().z;
@@ -182,24 +317,12 @@ void AutoTakeOff(void)
 
     float err = (altitude>AltCtlTarget)?(altitude-AltCtlTarget):(AltCtlTarget-altitude);
 
-    uint32_t NowTimeMs = GetSysTimeMs();
-
-    if(err < 5){
+    if(err < 3) {
         SetAltControlStatus(ALT_HOLD);
-        if(FinishTakeOff == false){
-            FinishTakeOff = true;
-            FinishTakeOffTime = NowTimeMs;
-        }
-        else if(FinishTakeOffTime == true){
-            if((NowTimeMs - FinishTakeOffTime)>5000){
-                SetFlightMode(AUTOLAND);
-                //SetFlightMode(COMMAND);
-            }
-        }
-    }else{
-        SetAltControlStatus(ALT_CHANGED);
-        FinishTakeOff = false;
-        FinishTakeOffTime = NowTimeMs;
+        //通知上位机起飞完成
+        CommandFeedback(FINISH_TAKEOFF_FEEDBACK);
+        //将控制权交还命令模式
+        SetFlightMode(COMMAND);
     }
 }
 
