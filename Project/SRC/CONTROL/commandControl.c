@@ -2,11 +2,12 @@
 #include "flightStatus.h"
 #include "drv_uart.h"
 
-COMMAND_t command;
+FLIGHT_COMMAND_t flightCommand;
+MOTION_COMMAND_t motionCommand;
 
 uint8_t CommandFeedbackBuffer[4];
 
-void CommandInit(void){
+void CommandInit(void) {
     CommandFeedbackBuffer[0] = 0xFE;
     CommandFeedbackBuffer[2] = 0xFE;
     CommandFeedbackBuffer[3] = 0xFE;
@@ -14,11 +15,50 @@ void CommandInit(void){
     CommandFeedback(COMMAND_STARTUP_CHECK);
 }
 
-void CommandDataDecode(uint8_t *raw){
+void CommandDataDecode(uint8_t *raw) {
+    //帧头帧尾校验
+    if (raw[0] != 0xAA || raw[14] != 0xBB) {
+        return;
+    }
 
+    uint16_t checksum = 0;
+    for (uint8_t i = 0; i < 15; i++) {
+        checksum += raw[i];
+    }
+
+    //和校验字节校验
+    if(checksum != raw[15]){
+        return;
+    }
+
+    // 飞行控制命令，控制角度和飞行速度
+    if(raw[1] == 0x41){
+        flightCommand.commandRollTarget = (float)(raw[2] + (raw[3]<<8));
+        flightCommand.commandPitchTarget = raw[4] + (raw[5]<<8);
+        flightCommand.commandYawVelocityTarget = raw[6] + (raw[7]<<8);
+        flightCommand.commandVelocityTargetX = raw[8] + (raw[9]<<8);
+        flightCommand.commandVelocityTargetY = raw[10] + (raw[11]<<8);
+        flightCommand.commandVelocityTargetZ = raw[12] + (raw[13]<<8);
+    }
+
+    if(raw[1] == 0x51){
+        //不能同时起飞和降落
+        if(raw[2] == 1 && raw[3] == 1){
+            return;
+        }
+        //不能同时解锁和上锁
+        if(raw[4] == 1 && raw[5] == 1){
+            return;
+        }
+
+        motionCommand.autoTakeOffCommand = raw[2];
+        motionCommand.autoLandCommand = raw[3];
+        motionCommand.armCommand = raw[4];
+        motionCommand.disarmCommand = raw[5];
+    }
 }
 
-void CommandFeedback(uint8_t feedback){
+void CommandFeedback(uint8_t feedback) {
     CommandFeedbackBuffer[1] = feedback;
-    Uart_SendData(6, (uint8_t *)CommandFeedbackBuffer, 4);
+    Uart_SendData(6, (uint8_t *) CommandFeedbackBuffer, 4);
 }

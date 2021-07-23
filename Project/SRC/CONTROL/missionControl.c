@@ -91,13 +91,12 @@ void MissionControl(void)
 // 命令模式使用流程管理，
 // 流程命令分为五种：解锁、起飞、命令控制、降落和上锁，对应五段流程：待解锁阶段、起飞阶段、命令控制阶段、降落阶段、待上锁阶段
 void CommandFlight(){
-    static bool ChangedFlagX, ChangedFlagY, ChangedFlagZ = false;
     Vector3f_t posNow = GetCopterPosition();
+    SetPosOuterCtlTarget(posNow);
 
     switch (commandStep) {
         case WaitArm:{
-            if(command.ArmFlag == 1){
-                command.ArmFlag = 0;
+            if(motionCommand.armCommand == 1){
                 SetArmedStatus(ARMED);
                 //向上位机报告解锁完成
                 CommandFeedback(FINISH_ARM_FEEDBACK);
@@ -105,8 +104,7 @@ void CommandFlight(){
             }
         }
         case InTakeOff:{
-            if(command.TakeOffFlag == 1){
-                command.TakeOffFlag = 0;
+            if(motionCommand.autoTakeOffCommand == 1){
                 //交由自动起飞模式控制起飞
                 SetFlightMode(AUTOTAKEOFF);
                 //向上位机报告开始起飞
@@ -115,71 +113,34 @@ void CommandFlight(){
             }
         }
         case FlightWithCommand:{
-            if(command.PositionHoldFlag == 1){
-                command.PositionHoldFlag = 0;
-                posCtlTarget = posNow;
+            if(flightCommand.commandVelocityTargetX != 0){
+                SetPosControlStatus(POS_CHANGED);
+                SetPosCtlStatusX(DISABLE);
+                SetPosInnerCtlTargetX(flightCommand.commandVelocityTargetX);
+            }else{
                 SetPosControlStatus(POS_HOLD);
-                SetPosOuterCtlTarget(posCtlTarget);
-                CommandFeedback(FINISH_POSITION_HOLD);
+                SetPosCtlStatusX(ENABLE);
             }
 
-            if(command.PositionXChangeFlag == 1){
-                command.PositionXChangeFlag = 0;
-                posCtlTarget.x += command.PositionXChange;
-                command.PositionXChange = 0;
+            if(flightCommand.commandVelocityTargetY != 0){
                 SetPosControlStatus(POS_CHANGED);
-                SetPosOuterCtlTarget(posCtlTarget);
-                ChangedFlagX = true;
-            }
-            //暂时只考虑每次改变一个轴的情况
-            if(ChangedFlagX == true){
-                float errX = posNow.x>posCtlTarget.x?(posNow.x-posCtlTarget.x):(posCtlTarget.x-posNow.x);
-                if(errX < 3){
-                    //移动已完成
-                    CommandFeedback(FINISH_MOVE_X_FEEDBACK);
-                    SetPosControlStatus(POS_HOLD);
-                    ChangedFlagX = false;
-                }
+                SetPosCtlStatusY(DISABLE);
+                SetPosInnerCtlTargetY(flightCommand.commandVelocityTargetY);
+            }else{
+                SetPosControlStatus(POS_HOLD);
+                SetPosCtlStatusY(ENABLE);
             }
 
-            if(command.PositionYChangeFlag == 1){
-                command.PositionYChangeFlag = 0;
-                posCtlTarget.y += command.PositionYChange;
-                command.PositionXChange = 0;
-                SetPosControlStatus(POS_CHANGED);
-                SetPosOuterCtlTarget(posCtlTarget);
-                ChangedFlagY = true;
-            }
-            if(ChangedFlagY == true){
-                float errY = posNow.y>posCtlTarget.y?(posNow.y-posCtlTarget.y):(posCtlTarget.y-posNow.y);
-                if(errY < 3){
-                    //移动已完成
-                    CommandFeedback(FINISH_MOVE_Y_FEEDBACK);
-                    SetPosControlStatus(POS_HOLD);
-                    ChangedFlagY = false;
-                }
-            }
-
-            if(command.PositionZChangeFlag == 1){
-                command.PositionZChangeFlag = 0;
-                posCtlTarget.z += command.PositionZChange;
-                command.PositionZChange = 0;
+            if(flightCommand.commandVelocityTargetZ != 0){
                 SetAltControlStatus(ALT_CHANGED);
-                SetAltOuterCtlTarget(posCtlTarget.z);
-                ChangedFlagZ = true;
-            }
-            if(ChangedFlagZ == true){
-                float errZ = posNow.z>posCtlTarget.z?(posNow.z-posCtlTarget.z):(posCtlTarget.z-posNow.z);
-                if(errZ < 3){
-                    //移动已完成
-                    CommandFeedback(FINISH_MOVE_Z_FEEDBACK);
-                    SetPosControlStatus(POS_HOLD);
-                    ChangedFlagZ = false;
-                }
+                SetAltCtlStatus(DISABLE);
+                SetAltInnerCtlTarget(flightCommand.commandVelocityTargetX);
+            }else{
+                SetAltControlStatus(POS_HOLD);
+                SetAltCtlStatus(ENABLE);
             }
 
-            if(command.LandFlag == 1){
-                command.LandFlag = 0;
+            if(motionCommand.autoLandCommand == 1){
                 //收到降落指令后跳转降落阶段
                 commandStep++;
             }
@@ -193,8 +154,7 @@ void CommandFlight(){
             commandStep++;
         }
         case WaitDisarm:{
-            if(command.DisarmFlag == 1){
-                command.DisarmFlag = 0;
+            if(motionCommand.disarmCommand == 1){
                 SetArmedStatus(DISARMED);
                 //向上位机报告降落完成
                 CommandFeedback(FINISH_DISARM_FEEDBACK);
@@ -223,7 +183,8 @@ void AutoLand(void)
 
     //原作者在此处根据GPS状态判断是否使能位置控制，先去掉
     //使能位置控制
-    SetPosCtlStatus(ENABLE);
+    SetPosCtlStatusX(ENABLE);
+    SetPosCtlStatusY(ENABLE);
 
     //更新位置控制目标
     SetPosOuterCtlTarget(posCtlTarget);
@@ -237,10 +198,10 @@ void AutoLand(void)
     //减速降落速度不应过低，以免低高度下位置发生漂移
     //在没有对地测距传感器的情况下，只能大致判断高度，提前进行减速
     if(altitude < 5){
-        velCtlTarget = -20.f;
+        velCtlTarget = -5.f;
     }
-    else if(altitude < 55){
-        velCtlTarget = -1.f * altitude - 15.f;
+    else if(altitude < 70){
+        velCtlTarget = -1.f * altitude;
     }
     else if(altitude < 500)
     {
@@ -300,7 +261,8 @@ void AutoTakeOff(void)
     SetYawHoldStatus(ENABLE);
 
     //使能位置控制
-    SetPosCtlStatus(ENABLE);
+    SetPosCtlStatusX(ENABLE);
+    SetPosCtlStatusY(ENABLE);
     SetPosControlStatus(POS_HOLD);
 
     //更新位置控制目标
@@ -372,7 +334,8 @@ void ReturnToHome(void)
         velCtlTargert = 0;
 
         //使能位置控制
-        SetPosCtlStatus(ENABLE);
+        SetPosCtlStatusX(ENABLE);
+        SetPosCtlStatusY(ENABLE);
         //设置位置控制目标
         SetPosOuterCtlTarget(posCtlTarget);
         //更新位置控制状态

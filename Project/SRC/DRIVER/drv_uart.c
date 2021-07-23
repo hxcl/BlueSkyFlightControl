@@ -9,7 +9,7 @@
  * @网站     bbs.loveuav.com
  * @日期     2018.05
 **********************************************************************************************************/
-#include <bsklinkDecode.h>
+#include "bsklinkDecode.h"
 #include "drv_uart.h"
 #include "string.h"
 #include "drv_sbus.h"
@@ -23,7 +23,7 @@ uint8_t COM2RxBuf[8];
 uint8_t COM3RxBuf[8];
 uint8_t COM4RxBuf[8];
 uint8_t COM5RxBuf[8];
-uint8_t COM6RxBuf[8];
+uint8_t COM6RxBuf[16];
 
 /**********************************************************************************************************
 *函 数 名: Uart_Open
@@ -45,7 +45,7 @@ void Uart_Init() {
     HAL_UART_Receive_DMA(&COM2, COM2RxBuf, 1);
 
     // LC302 via COM3(huart4)
-    HAL_UART_Receive_DMA(&COM3, COM4RxBuf, 1);
+    HAL_UART_Receive_IT(&COM3, COM4RxBuf, 1);
 
     // OpenMV via COM4(huart7)
     HAL_UART_Receive_DMA(&COM4, COM6RxBuf, 8);
@@ -54,7 +54,7 @@ void Uart_Init() {
     HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
 
     // Computer via COM6(huart5)
-    HAL_UART_Receive_DMA(&COM6, COM6RxBuf, 8);
+    HAL_UART_Receive_DMA(&COM6, COM6RxBuf, 16);
 }
 
 /**********************************************************************************************************
@@ -99,7 +99,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 #endif
         HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
     } else if(huart == &COM6){
-        CommandDataDecode(*COM6RxBuf);
-        HAL_UART_Transmit_IT(&COM6, COM6RxBuf, 8);
+        CommandDataDecode(COM6RxBuf);
     }
 }

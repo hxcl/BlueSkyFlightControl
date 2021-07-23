@@ -191,7 +191,8 @@ static void AutoControl(RCCOMMAND_t rcCommand, RCTARGET_t* rcTarget)
         lastVelCtlTarget.y = velCtlTarget.y;
 
         //直接控制速度，禁用位置控制
-        SetPosCtlStatus(DISABLE);
+        SetPosCtlStatusX(DISABLE);
+        SetPosCtlStatusY(DISABLE);
 
         //更新位置内环控制目标
         SetPosInnerCtlTarget(velCtlTarget);
@@ -272,7 +273,8 @@ static void AutoControl(RCCOMMAND_t rcCommand, RCTARGET_t* rcTarget)
         }
 
         //使能位置控制
-        SetPosCtlStatus(ENABLE);
+        SetPosCtlStatusX(ENABLE);
+        SetPosCtlStatusY(ENABLE);
 
         //更新位置控制状态
         SetPosControlStatus(POS_HOLD);

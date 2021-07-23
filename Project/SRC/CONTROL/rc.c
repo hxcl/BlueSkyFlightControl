@@ -521,7 +521,7 @@ void FlightStatusUpdate(void)
         }
 
         // 当能够获得准确的高度测量值时使用高度和z轴速度判断降落完成
-        if(GetCopterPosition().z <= 5 && GetCopterVelocity().z <= 0.5){
+        if(GetCopterPosition().z <= 7 && GetCopterVelocity().z <= 7){
             SetFlightStatus(FINISH_LANDING);
         }
     }

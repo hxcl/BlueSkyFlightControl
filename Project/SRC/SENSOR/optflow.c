@@ -114,7 +114,7 @@ void OptFlowDataTreat(void) {
         optflow_manager.Ref_gnd_vel_y = optflow_manager.Velocity_uncoupled_lpf_y * Height;
 
         // 加速度补偿，tao参数根据截止频率求算，此处取约15Hz
-        LinearComplementaryFilter(0.01, 0.0208, GetCopterAccel().x, GetCopterAccel().y, optflow_manager.Ref_gnd_vel_x,
+        LinearComplementaryFilter(0.01f, 0.0208f, GetCopterAccel().x, GetCopterAccel().y, optflow_manager.Ref_gnd_vel_x,
                                     optflow_manager.Ref_gnd_vel_y, &(optflow_manager.RefGroundVelocityAccFilteredX),
                                     &(optflow_manager.RefGroundVelocityAccFilteredY));
 

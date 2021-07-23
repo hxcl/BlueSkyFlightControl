@@ -363,6 +363,26 @@ void PositionInnerControl(void) {
 }
 
 /**********************************************************************************************************
+*函 数 名: SetPosInnerCtlTargetX
+*功能说明: 设置位置内环X轴控制目标量
+*形    参: 控制目标值
+*返 回 值: 无
+**********************************************************************************************************/
+void SetPosInnerCtlTargetX(float targetX) {
+    fc.posInnerTarget.x = targetX;
+}
+
+/**********************************************************************************************************
+*函 数 名: SetPosInnerCtlTargetY
+*功能说明: 设置位置内环Y轴控制目标量
+*形    参: 控制目标值
+*返 回 值: 无
+**********************************************************************************************************/
+void SetPosInnerCtlTargetY(float targetY) {
+    fc.posInnerTarget.y = targetY;
+}
+
+/**********************************************************************************************************
 *函 数 名: SetPosInnerCtlTarget
 *功能说明: 设置位置内环控制目标量
 *形    参: 控制目标值
@@ -405,7 +425,11 @@ void PositionOuterControl(void) {
 
     //将位置外环控制量作为位置内环的控制目标
     //若当前位置控制被禁用则不输出
-    if (fc.posCtlFlag == ENABLE)
+    if (fc.posCtlFlagX == ENABLE){
+        SetPosInnerCtlTarget(posOuterCtlValue);
+    }else if(fc.posCtlFlagY == ENABLE){
+
+    }
         SetPosInnerCtlTarget(posOuterCtlValue);
 }
 
@@ -431,13 +455,23 @@ void SetAltCtlStatus(uint8_t status) {
 }
 
 /**********************************************************************************************************
-*函 数 名: SetPosCtlStatus
+*函 数 名: SetPosCtlStatusX
+*功能说明: 设置X轴位移控制状态
+*形    参: 状态量（ENABLE或DISABLE）
+*返 回 值: 无
+**********************************************************************************************************/
+void SetPosCtlStatusX(uint8_t status) {
+    fc.posCtlFlagX = status;
+}
+
+/**********************************************************************************************************
+*函 数 名: SetPosCtlStatusY
 *功能说明: 设置高度控制状态
 *形    参: 状态量（ENABLE或DISABLE）
 *返 回 值: 无
 **********************************************************************************************************/
-void SetPosCtlStatus(uint8_t status) {
-    fc.posCtlFlag = status;
+void SetPosCtlStatusY(uint8_t status) {
+    fc.posCtlFlagY = status;
 }
 
 /**********************************************************************************************************

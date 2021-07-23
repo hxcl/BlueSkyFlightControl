@@ -53,7 +53,8 @@ typedef struct
     Vector3f_t posOuterError;       //位置外环（位置）控制误差
 
     uint8_t    altCtlFlag;          //高度控制使能标志位
-    uint8_t    posCtlFlag;          //位置控制使能标志位
+    uint8_t    posCtlFlagX;          //位置控制使能标志位
+    uint8_t    posCtlFlagY;          //位置控制使能标志位
     uint8_t    yawHoldFlag;         //航向锁定控制使能标志位
 
     int16_t    maxBrakeAngle;       //最大刹车角度
@@ -75,10 +76,13 @@ void SetYawCtlTarget(float target);
 void SetAltInnerCtlTarget(float target);
 void SetAltOuterCtlTarget(float target);
 void SetPosInnerCtlTarget(Vector3f_t target);
+void SetPosInnerCtlTargetX(float targetX);
+void SetPosInnerCtlTargetY(float targetY);
 void SetPosOuterCtlTarget(Vector3f_t target);
 
 void SetAltCtlStatus(uint8_t status);
-void SetPosCtlStatus(uint8_t status);
+void SetPosCtlStatusX(uint8_t status);
+void SetPosCtlStatusY(uint8_t status);
 void SetYawHoldStatus(uint8_t status);
 
 Vector3f_t GetAttInnerCtlError(void);

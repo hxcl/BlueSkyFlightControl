@@ -21,26 +21,28 @@ enum
 };
 
 typedef struct {
-    uint8_t ArmFlag;
-    uint8_t DisarmFlag;
-    uint8_t TakeOffFlag;
-    uint8_t LandFlag;
+    float commandRollTarget;
+    float commandPitchTarget;
+    float commandYawVelocityTarget;
 
-    uint8_t PositionHoldFlag;
-    uint8_t PositionXChangeFlag;
-    uint8_t PositionYChangeFlag;
-    uint8_t PositionZChangeFlag;
+    float commandVelocityTargetX;
+    float commandVelocityTargetY;
+    float commandVelocityTargetZ;
+} FLIGHT_COMMAND_t;
 
-    uint8_t TakeOffAltitude;
-    int8_t PositionXChange;
-    int8_t PositionYChange;
-    int8_t PositionZChange;
-} COMMAND_t;
+typedef struct {
+    uint8_t autoTakeOffCommand;
+    uint8_t autoLandCommand;
 
-extern COMMAND_t command;
+    uint8_t armCommand;
+    uint8_t disarmCommand;
+} MOTION_COMMAND_t;
+
+extern FLIGHT_COMMAND_t flightCommand;
+extern MOTION_COMMAND_t motionCommand;
 
 void CommandInit(void);
-void CommandDataDecode();
+void CommandDataDecode(uint8_t *raw);
 
 void CommandFeedback(uint8_t feedback);
 

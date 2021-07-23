@@ -94,7 +94,8 @@ void WaypointControl(void)
     //更新高度控制状态
     SetAltControlStatus(ALT_HOLD);
     //使能位置控制
-    SetPosCtlStatus(ENABLE);
+    SetPosCtlStatusX(ENABLE);
+    SetPosCtlStatusY(ENABLE);
     //更新位置控制状态
     SetPosControlStatus(POS_HOLD);
     //使能航向锁定
