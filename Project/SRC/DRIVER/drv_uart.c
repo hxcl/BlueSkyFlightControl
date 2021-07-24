@@ -47,14 +47,14 @@ void Uart_Init() {
     // LC302 via COM3(huart4)
     HAL_UART_Receive_IT(&COM3, COM4RxBuf, 1);
 
-    // OpenMV via COM4(huart7)
-    HAL_UART_Receive_DMA(&COM4, COM6RxBuf, 8);
+    // OpenMV via COM4(huart5)
+    HAL_UART_Receive_DMA(&COM6, COM6RxBuf, 8);
 
     // S.BUS via COM5(huart8)
     HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
 
-    // Computer via COM6(huart5)
-    HAL_UART_Receive_DMA(&COM6, COM6RxBuf, 16);
+    // Computer via COM6(huart7)
+    HAL_UART_Receive_DMA(&COM4, COM6RxBuf, 16);
 }
 
 /**********************************************************************************************************
@@ -90,7 +90,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         LC302_Decode(COM3RxBuf[0]);
         HAL_UART_Receive_IT(&COM3, COM3RxBuf, 1);
     } else if (huart == &COM4){
-
+        CommandDataDecode(COM6RxBuf);
     } else if (huart == &COM5) {
 #ifdef USE_SBUS
         Sbus_Decode(COM5RxBuf[0]);
@@ -99,6 +99,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 #endif
         HAL_UART_Receive_IT(&COM5, COM5RxBuf, 1);
     } else if(huart == &COM6){
-        CommandDataDecode(COM6RxBuf);
+
     }
 }

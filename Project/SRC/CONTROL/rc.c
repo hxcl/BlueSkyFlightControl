@@ -521,7 +521,8 @@ void FlightStatusUpdate(void)
         }
 
         // 当能够获得准确的高度测量值时使用高度和z轴速度判断降落完成
-        if(GetCopterPosition().z <= 7 && GetCopterVelocity().z <= 7){
+        // 建议在测距传感器高度大于测距死区的情况下使用，否则需要结合降落速度限制仔细优化，才能有较好的效果
+        if(GetCopterPosition().z <= 10){
             SetFlightStatus(FINISH_LANDING);
         }
     }

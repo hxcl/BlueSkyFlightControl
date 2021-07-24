@@ -195,13 +195,12 @@ void AutoLand(void)
     //更新高度控制状态
     SetAltControlStatus(ALT_CHANGED);
 
-    //减速降落速度不应过低，以免低高度下位置发生漂移
-    //在没有对地测距传感器的情况下，只能大致判断高度，提前进行减速
-    if(altitude < 5){
-        velCtlTarget = -5.f;
+    //由于地面效应的存在，飞机将接地时升力显著上升，减速降落的目标速度不应过低，以免低高度下位置发生漂移
+    if(altitude < 10){
+        velCtlTarget = -20.f;
     }
-    else if(altitude < 70){
-        velCtlTarget = -1.f * altitude;
+    else if(altitude < 60){
+        velCtlTarget = -1.f * altitude - 10.f;
     }
     else if(altitude < 500)
     {
@@ -226,7 +225,7 @@ void AutoLand(void)
 
     if(GetCopterVelocity().z == 0) {
         //通知上位机降落完成
-        CommandFeedback(FINISH_LAND_FEEDBACK);
+        //CommandFeedback(FINISH_LAND_FEEDBACK);
         //将控制权交还命令模式
         SetFlightMode(COMMAND);
     }
@@ -279,10 +278,10 @@ void AutoTakeOff(void)
 
     float err = (altitude>AltCtlTarget)?(altitude-AltCtlTarget):(AltCtlTarget-altitude);
 
-    if(err < 3) {
+    if(err < 1) {
         SetAltControlStatus(ALT_HOLD);
         //通知上位机起飞完成
-        CommandFeedback(FINISH_TAKEOFF_FEEDBACK);
+        //CommandFeedback(FINISH_TAKEOFF_FEEDBACK);
         //将控制权交还命令模式
         SetFlightMode(COMMAND);
     }

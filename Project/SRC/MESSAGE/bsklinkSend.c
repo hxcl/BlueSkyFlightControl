@@ -900,7 +900,7 @@ void BsklinkSendPosAnalyse(uint8_t* sendFlag)
     payload.posEstError.x = 0;                                   //高度估计误差 单位：cm
     payload.posEstError.y = 0;
     payload.posEstError.z = 0;
-    payload.posCtlError.x = GetPosOuterCtlError().x;             //高度控制误差 单位：cm
+    payload.posCtlError.x = GetPosOuterCtlError().x;             //位置控制误差 单位：cm
     payload.posCtlError.y = GetPosOuterCtlError().y;
     payload.posCtlError.z = GetPosOuterCtlError().z;
 
