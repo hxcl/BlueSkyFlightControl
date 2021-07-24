@@ -431,6 +431,9 @@ void SetFlightMode(uint8_t mode)
         if(flyStatus.armed == ARMED)
             flyStatus.mode = AUTOLAND;		//自动降落
         break;
+    case    COMMAND:
+        flyStatus.mode = COMMAND;
+        break;
     case    RETURNTOHOME:
         if(flyStatus.armed == ARMED)
             flyStatus.mode = RETURNTOHOME;	//自动返航

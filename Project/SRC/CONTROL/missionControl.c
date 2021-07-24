@@ -102,6 +102,7 @@ void CommandFlight(){
                 CommandFeedback(FINISH_ARM_FEEDBACK);
                 commandStep++;
             }
+            break;
         }
         case InTakeOff:{
             if(motionCommand.autoTakeOffCommand == 1){
@@ -111,6 +112,7 @@ void CommandFlight(){
                 CommandFeedback(START_TAKEOFF_FEEDBACK);
                 commandStep++;
             }
+            break;
         }
         case FlightWithCommand:{
             if(flightCommand.commandVelocityTargetX != 0){
@@ -144,6 +146,7 @@ void CommandFlight(){
                 //收到降落指令后跳转降落阶段
                 commandStep++;
             }
+            break;
         }
         case InLanding:{
             //降落命令的执行与其他模式稍有不同，当飞控处于命令飞行阶段时，上位机下达降落命令后才前进到降落阶段，因此直接执行
@@ -152,6 +155,7 @@ void CommandFlight(){
             //向上位机报告开始降落
             CommandFeedback(START_LAND_FEEDBACK);
             commandStep++;
+            break;
         }
         case WaitDisarm:{
             if(motionCommand.disarmCommand == 1){
@@ -160,6 +164,7 @@ void CommandFlight(){
                 CommandFeedback(FINISH_DISARM_FEEDBACK);
                 commandStep = 0;
             }
+            break;
         }
         default:{
 

@@ -21,24 +21,25 @@ void CommandDataDecode(uint8_t *raw) {
         return;
     }
 
-    uint16_t checksum = 0;
-    for (uint8_t i = 0; i < 15; i++) {
-        checksum += raw[i];
-    }
-
-    //和校验字节校验
-    if(checksum != raw[15]){
-        return;
-    }
+//    uint16_t checksum = 0;
+//    for (uint8_t i = 0; i < 15; i++) {
+//        checksum += raw[i];
+//    }
+//    checksum |= 0x00FF;
+//
+//    //和校验字节校验
+//    if(checksum != raw[15]){
+//        return;
+//    }
 
     // 飞行控制命令，控制角度和飞行速度
     if(raw[1] == 0x41){
-        flightCommand.commandRollTarget = (float)(raw[2] + (raw[3]<<8));
-        flightCommand.commandPitchTarget = raw[4] + (raw[5]<<8);
-        flightCommand.commandYawVelocityTarget = raw[6] + (raw[7]<<8);
-        flightCommand.commandVelocityTargetX = raw[8] + (raw[9]<<8);
-        flightCommand.commandVelocityTargetY = raw[10] + (raw[11]<<8);
-        flightCommand.commandVelocityTargetZ = raw[12] + (raw[13]<<8);
+        flightCommand.commandRollTarget = (int16_t)(raw[2]|raw[3]<<8);
+        flightCommand.commandPitchTarget = (int16_t)(raw[4]|raw[5]<<8);
+        flightCommand.commandYawVelocityTarget = (int16_t)(raw[6]|raw[7]<<8);
+        flightCommand.commandVelocityTargetX = (int16_t)(raw[8]|raw[9]<<8);
+        flightCommand.commandVelocityTargetY = (int16_t)(raw[10]|raw[11]<<8);
+        flightCommand.commandVelocityTargetZ = (int16_t)(raw[12]|raw[13]<<8);
     }
 
     if(raw[1] == 0x51){
@@ -60,5 +61,5 @@ void CommandDataDecode(uint8_t *raw) {
 
 void CommandFeedback(uint8_t feedback) {
     CommandFeedbackBuffer[1] = feedback;
-    Uart_SendData(6, (uint8_t *) CommandFeedbackBuffer, 4);
+    //Uart_SendData(6, (uint8_t *) CommandFeedbackBuffer, 4);
 }

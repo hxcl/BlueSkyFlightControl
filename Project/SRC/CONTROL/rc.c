@@ -67,7 +67,7 @@ void RcInit(void)
 
     //设置各辅助通道对应的飞行模式
     rcAuxMode[AUX1][LOW]  = AUTOLAND;
-    rcAuxMode[AUX1][MID]  = AUTOTAKEOFF;
+    rcAuxMode[AUX1][MID]  = COMMAND;
     rcAuxMode[AUX1][HIGH] = AUTO;
 
     rcAuxMode[AUX2][LOW]  = 0xFF;//AUTO;
@@ -458,6 +458,10 @@ void FlightStatusUpdate(void)
             }
             //命令控制模式下，解锁后保持解锁状态，等待起飞模式跳转到起飞状态
             else if(GetFlightMode() == COMMAND){
+                SetArmedStatus(ARMED);
+            }
+            //自动起飞模式下，解锁后保持解锁状态，等待跳转到起飞状态
+            else if(GetFlightMode() == AUTOTAKEOFF){
                 SetArmedStatus(ARMED);
             }
             else
