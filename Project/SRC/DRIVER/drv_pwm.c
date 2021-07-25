@@ -56,7 +56,7 @@ void TempControlPWMSet(int32_t pwmValue) {
 /**********************************************************************************************************
 *函 数 名: ServoControlPWMSet
 *功能说明: 舵机PWM输出值设置
-*形    参: Servo number & Target angle
+*形    参: Servo number & Target angle(-90°-90°)
 *返 回 值: 无
 **********************************************************************************************************/
 void ServoControlPWMSet(uint8_t motor, int16_t targetAngle) {
@@ -99,12 +99,12 @@ void MotorPWMSet(uint8_t motor, uint16_t pwmValue) {
 }
 
 /**********************************************************************************************************
-*函 数 名: BeepPWMSet
+*函 数 名: BuzzerPWMSet
 *功能说明: 蜂鸣器PWM输出值设置
 *形    参: PWM值（0-2000）
 *返 回 值: 无
 **********************************************************************************************************/
-void BeepPWMSet(uint16_t pwmValue) {
+void BuzzerPWMSet(uint16_t pwmValue) {
     uint16_t temp = 2000 - pwmValue;
     __HAL_TIM_SET_COMPARE(&Beep_TIM, Beep_CH, pwmValue);
 }

@@ -27,7 +27,7 @@ typedef struct {
 
     float commandVelocityTargetX;
     float commandVelocityTargetY;
-    float commandVelocityTargetZ;
+    float commandAltitudeTargetZ;
 } FLIGHT_COMMAND_t;
 
 typedef struct {
@@ -36,6 +36,10 @@ typedef struct {
 
     uint8_t armCommand;
     uint8_t disarmCommand;
+
+    uint8_t buzzerRing;
+
+    int8_t servo1Value;
 } MOTION_COMMAND_t;
 
 extern FLIGHT_COMMAND_t flightCommand;
