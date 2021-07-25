@@ -39,7 +39,7 @@ void CommandDataDecode(uint8_t *raw) {
         flightCommand.commandYawVelocityTarget = (int16_t)(raw[6]|raw[7]<<8);
         flightCommand.commandVelocityTargetX = (int16_t)(raw[8]|raw[9]<<8);
         flightCommand.commandVelocityTargetY = (int16_t)(raw[10]|raw[11]<<8);
-        flightCommand.commandVelocityTargetZ = (int16_t)(raw[12]|raw[13]<<8);
+        flightCommand.commandAltitudeTargetZ = (int16_t)(raw[12]|raw[13]<<8);
     }
 
     if(raw[1] == 0x51){
@@ -57,6 +57,8 @@ void CommandDataDecode(uint8_t *raw) {
         motionCommand.armCommand = raw[4];
         motionCommand.disarmCommand = raw[5];
         motionCommand.flyAroundRod = raw[6];
+        motionCommand.buzzerRing = raw[7];
+        motionCommand.servo1Value = (int8_t)raw[10];
     }
 }
 

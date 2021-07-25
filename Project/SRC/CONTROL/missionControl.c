@@ -18,6 +18,8 @@
 #include "navigation.h"
 #include "ahrs.h"
 #include "gps.h"
+#include "buzzer.h"
+#include "Servo.h"
 
 static Vector3f_t posCtlTarget;
 static float yawHold;
@@ -108,7 +110,7 @@ void CommandFlight() {
                 SetArmedStatus(ARMED);
                 //向上位机报告解锁完成
                 CommandFeedback(FINISH_ARM_FEEDBACK);
-                commandStep++;
+                commandStep = InTakeOff;
             }
             break;
         }
@@ -118,7 +120,7 @@ void CommandFlight() {
                 SetFlightMode(AUTOTAKEOFF);
                 //向上位机报告开始起飞
                 CommandFeedback(START_TAKEOFF_FEEDBACK);
-                commandStep++;
+                commandStep = FlightWithCommand;
             }
             break;
         }
@@ -131,7 +133,7 @@ void CommandFlight() {
                 SetPosCtlStatusX(ENABLE);
                 SetPosCtlStatusY(ENABLE);
                 //收到降落指令后跳转降落阶段
-                commandStep++;
+                commandStep = InLanding;
                 break;
             }
 
@@ -179,14 +181,13 @@ void CommandFlight() {
                 SetPosCtlStatusY(ENABLE);
             }
 
-            if (flightCommand.commandVelocityTargetZ != 0) {
+            //高度控制采用直接控制高度外环的方式，高度目标为0时表示保持当前高度
+            if(flightCommand.commandAltitudeTargetZ != 0){
                 SetAltControlStatus(ALT_CHANGED);
-                SetAltCtlStatus(DISABLE);
-                SetAltInnerCtlTarget(flightCommand.commandVelocityTargetZ);
-                //运动过程中不断刷新外环控制目标
-                SetAltOuterCtlTarget(posNow.z);
-            } else {
-                SetAltControlStatus(POS_HOLD);
+                SetAltCtlStatus(ENABLE);
+                SetAltOuterCtlTarget(flightCommand.commandAltitudeTargetZ);
+            }else{
+                SetAltControlStatus(ALT_HOLD);
                 SetAltCtlStatus(ENABLE);
             }
             break;
@@ -197,7 +198,7 @@ void CommandFlight() {
             SetFlightMode(AUTOLAND);
             //向上位机报告开始降落
             CommandFeedback(START_LAND_FEEDBACK);
-            commandStep++;
+            commandStep = WaitDisarm;
             break;
         }
         case WaitDisarm: {
@@ -205,7 +206,10 @@ void CommandFlight() {
                 SetArmedStatus(DISARMED);
                 //向上位机报告降落完成
                 CommandFeedback(FINISH_DISARM_FEEDBACK);
-                commandStep = 0;
+                //上锁后跳转回初始步骤
+                if(GetArmedStatus() == DISARMED){
+                    commandStep = WaitArm;
+                }
             }
             break;
         }
@@ -213,6 +217,16 @@ void CommandFlight() {
 
         }
     }
+
+    if(motionCommand.buzzerRing == 1){
+        buzzerRing();
+    }
+    else{
+        buzzerStop();
+    }
+
+    //设置舵机旋转角度
+    ServoSetDeg(1, motionCommand.servo1Value);
 }
 
 /**********************************************************************************************************
