@@ -36,6 +36,8 @@ typedef struct {
 
     uint8_t armCommand;
     uint8_t disarmCommand;
+
+    uint8_t flyAroundRod;
 } MOTION_COMMAND_t;
 
 extern FLIGHT_COMMAND_t flightCommand;

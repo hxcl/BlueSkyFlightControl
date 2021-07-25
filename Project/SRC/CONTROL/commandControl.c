@@ -56,6 +56,7 @@ void CommandDataDecode(uint8_t *raw) {
         motionCommand.autoLandCommand = raw[3];
         motionCommand.armCommand = raw[4];
         motionCommand.disarmCommand = raw[5];
+        motionCommand.flyAroundRod = raw[6];
     }
 }
 
