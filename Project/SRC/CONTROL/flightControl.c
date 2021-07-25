@@ -17,8 +17,11 @@
 #include "navigation.h"
 #include "gps.h"
 #include "motor.h"
+#include "commandControl.h"
 
 FLIGHTCONTROL_t fc;
+extern FLIGHT_COMMAND_t flightCommand;
+extern MOTION_COMMAND_t motionCommand;
 
 static void PIDReset(void);
 
@@ -255,6 +258,9 @@ void AttitudeOuterControl(void) {
         attOuterCtlValue.z = PID_GetP(&fc.pid[YAW_OUTER], fc.attOuterError.z) * 1.0f;
         //限幅，单位为°/s
         attOuterCtlValue.z = ConstrainFloat(attOuterCtlValue.z, -50, 50);
+    } else if(motionCommand.flyAroundRod==1){
+        //航向锁定失能且是绕杆模式则将上位机控制目标指令作为目标角速度
+        attOuterCtlValue.z = flightCommand.commandYawVelocityTarget;
     } else {
         attOuterCtlValue.z = fc.rcTarget.yaw * yawRate;
     }
@@ -358,6 +364,11 @@ void PositionInnerControl(void) {
         posInnerCtlOutput.y = ConstrainFloat(posInnerCtlOutput.y, -25, 25);
     }
 
+    //判断是否是绕杆飞行，如果是则将姿态控制直接设为飞控命令目标值，普通沿x，y轴的飞行按照默认的计算值
+    if (motionCommand.flyAroundRod == 1) {
+        posInnerCtlOutput.x = flightCommand.commandPitchTarget;
+        posInnerCtlOutput.y = flightCommand.commandRollTarget;
+    }
     //将位置内环控制量作为姿态外环的控制目标
     SetAttOuterCtlTarget(posInnerCtlOutput);
 }

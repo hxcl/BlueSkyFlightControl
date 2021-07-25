@@ -37,6 +37,8 @@ typedef struct {
     uint8_t armCommand;
     uint8_t disarmCommand;
 
+    uint8_t flyAroundRod;
+  
     uint8_t buzzerRing;
 
     int8_t servo1Value;

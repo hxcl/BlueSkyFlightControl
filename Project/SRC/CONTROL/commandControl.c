@@ -56,9 +56,9 @@ void CommandDataDecode(uint8_t *raw) {
         motionCommand.autoLandCommand = raw[3];
         motionCommand.armCommand = raw[4];
         motionCommand.disarmCommand = raw[5];
-
-        motionCommand.buzzerRing = raw[6];
-        motionCommand.servo1Value = (int8_t)raw[7];
+        motionCommand.flyAroundRod = raw[6];
+        motionCommand.buzzerRing = raw[7];
+        motionCommand.servo1Value = (int8_t)raw[10];
     }
 }
 
