@@ -92,7 +92,23 @@ void MissionControl(void)
 // 流程命令分为五种：解锁、起飞、命令控制、降落和上锁，对应五段流程：待解锁阶段、起飞阶段、命令控制阶段、降落阶段、待上锁阶段
 void CommandFlight(){
     Vector3f_t posNow = GetCopterPosition();
-    SetPosOuterCtlTarget(posNow);
+
+    // 待机模式刷新目标位置
+    if(GetFlightStatus() == STANDBY)
+    {
+        posCtlTarget.x = posNow.x;
+        posCtlTarget.y = posNow.y;
+        //使能位置控制
+        SetPosCtlStatusX(ENABLE);
+        SetPosCtlStatusY(ENABLE);
+        SetPosControlStatus(POS_HOLD);
+        SetPosOuterCtlTarget(posCtlTarget);
+
+        yawHold = GetCopterAngle().z;
+        //设置航向锁定目标角度，使能航向锁定
+        SetYawCtlTarget(yawHold);
+        SetYawHoldStatus(ENABLE);
+    }
 
     switch (commandStep) {
         case WaitArm:{
@@ -115,10 +131,24 @@ void CommandFlight(){
             break;
         }
         case FlightWithCommand:{
+            if(motionCommand.autoLandCommand == 1){
+                //以当前位置定点降落
+                posCtlTarget = posNow;
+                SetPosOuterCtlTarget(posCtlTarget);
+                SetPosControlStatus(POS_HOLD);
+                SetPosCtlStatusX(ENABLE);
+                SetPosCtlStatusY(ENABLE);
+                //收到降落指令后跳转降落阶段
+                commandStep++;
+                break;
+            }
+
             if(flightCommand.commandVelocityTargetX != 0){
                 SetPosControlStatus(POS_CHANGED);
                 SetPosCtlStatusX(DISABLE);
                 SetPosInnerCtlTargetX(flightCommand.commandVelocityTargetX);
+                //运动过程中不断刷新外环控制目标
+                SetPosOuterCtlTargetX(posNow.x);
             }else{
                 SetPosControlStatus(POS_HOLD);
                 SetPosCtlStatusX(ENABLE);
@@ -128,6 +158,8 @@ void CommandFlight(){
                 SetPosControlStatus(POS_CHANGED);
                 SetPosCtlStatusY(DISABLE);
                 SetPosInnerCtlTargetY(flightCommand.commandVelocityTargetY);
+                //运动过程中不断刷新外环控制目标
+                SetPosOuterCtlTargetY(posNow.y);
             }else{
                 SetPosControlStatus(POS_HOLD);
                 SetPosCtlStatusY(ENABLE);
@@ -136,15 +168,12 @@ void CommandFlight(){
             if(flightCommand.commandVelocityTargetZ != 0){
                 SetAltControlStatus(ALT_CHANGED);
                 SetAltCtlStatus(DISABLE);
-                SetAltInnerCtlTarget(flightCommand.commandVelocityTargetX);
+                SetAltInnerCtlTarget(flightCommand.commandVelocityTargetZ);
+                //运动过程中不断刷新外环控制目标
+                SetAltOuterCtlTarget(posNow.z);
             }else{
                 SetAltControlStatus(POS_HOLD);
                 SetAltCtlStatus(ENABLE);
-            }
-
-            if(motionCommand.autoLandCommand == 1){
-                //收到降落指令后跳转降落阶段
-                commandStep++;
             }
             break;
         }

@@ -425,12 +425,33 @@ void PositionOuterControl(void) {
 
     //将位置外环控制量作为位置内环的控制目标
     //若当前位置控制被禁用则不输出
-    if (fc.posCtlFlagX == ENABLE){
-        SetPosInnerCtlTarget(posOuterCtlValue);
-    }else if(fc.posCtlFlagY == ENABLE){
-
+    if (fc.posCtlFlagX == ENABLE) {
+        SetPosInnerCtlTargetX(posOuterCtlValue.x);
     }
-        SetPosInnerCtlTarget(posOuterCtlValue);
+
+    if (fc.posCtlFlagY == ENABLE) {
+        SetPosInnerCtlTargetY(posOuterCtlValue.y);
+    }
+}
+
+/**********************************************************************************************************
+*函 数 名: SetPosOuterCtlTargetX
+*功能说明: 设置位置外环X轴控制目标量
+*形    参: 控制目标值
+*返 回 值: 无
+**********************************************************************************************************/
+void SetPosOuterCtlTargetX(float target) {
+    fc.posOuterTarget.x = target;
+}
+
+/**********************************************************************************************************
+*函 数 名: SetPosOuterCtlTargetY
+*功能说明: 设置位置外环Y轴控制目标量
+*形    参: 控制目标值
+*返 回 值: 无
+**********************************************************************************************************/
+void SetPosOuterCtlTargetY(float target) {
+    fc.posOuterTarget.y = target;
 }
 
 /**********************************************************************************************************

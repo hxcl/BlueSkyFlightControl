@@ -25,7 +25,7 @@ void CommandDataDecode(uint8_t *raw) {
 //    for (uint8_t i = 0; i < 15; i++) {
 //        checksum += raw[i];
 //    }
-//    checksum |= 0x00FF;
+//    checksum &= 0x00FF;
 //
 //    //和校验字节校验
 //    if(checksum != raw[15]){

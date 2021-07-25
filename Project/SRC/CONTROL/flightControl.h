@@ -75,10 +75,14 @@ void SetYawCtlTarget(float target);
 
 void SetAltInnerCtlTarget(float target);
 void SetAltOuterCtlTarget(float target);
+
 void SetPosInnerCtlTarget(Vector3f_t target);
 void SetPosInnerCtlTargetX(float targetX);
 void SetPosInnerCtlTargetY(float targetY);
+
 void SetPosOuterCtlTarget(Vector3f_t target);
+void SetPosOuterCtlTargetX(float target);
+void SetPosOuterCtlTargetY(float target);
 
 void SetAltCtlStatus(uint8_t status);
 void SetPosCtlStatusX(uint8_t status);
