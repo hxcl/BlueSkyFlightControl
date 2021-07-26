@@ -40,12 +40,16 @@ typedef struct {
     uint8_t flyAroundRod;
   
     uint8_t buzzerRing;
-
-    int8_t servo1Value;
 } MOTION_COMMAND_t;
+
+typedef struct {
+    int16_t servo1Value;
+    int16_t servo2Value;
+} SERVO_COMMAND_t;
 
 extern FLIGHT_COMMAND_t flightCommand;
 extern MOTION_COMMAND_t motionCommand;
+extern SERVO_COMMAND_t servoCommand;
 
 void CommandInit(void);
 void CommandDataDecode(uint8_t *raw);

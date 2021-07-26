@@ -4,6 +4,7 @@
 
 FLIGHT_COMMAND_t flightCommand;
 MOTION_COMMAND_t motionCommand;
+SERVO_COMMAND_t servoCommand;
 
 uint8_t CommandFeedbackBuffer[4];
 
@@ -58,7 +59,11 @@ void CommandDataDecode(uint8_t *raw) {
         motionCommand.disarmCommand = raw[5];
         motionCommand.flyAroundRod = raw[6];
         motionCommand.buzzerRing = raw[7];
-        motionCommand.servo1Value = (int8_t)raw[10];
+    }
+
+    if(raw[1] == 0x61){
+        servoCommand.servo1Value = (int16_t)(raw[2]|raw[3]<<8);
+        servoCommand.servo2Value = (int16_t)(raw[4]|raw[5]<<8);
     }
 }
 

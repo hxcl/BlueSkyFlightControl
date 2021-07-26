@@ -226,7 +226,8 @@ void CommandFlight() {
     }
 
     //设置舵机旋转角度
-    ServoSetDeg(1, motionCommand.servo1Value);
+    ServoSetDeg(1, servoCommand.servo1Value);
+    ServoSetDeg(2, servoCommand.servo2Value);
 }
 
 /**********************************************************************************************************
