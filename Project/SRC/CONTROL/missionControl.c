@@ -292,7 +292,7 @@ void AutoLand(void) {
 **********************************************************************************************************/
 void AutoTakeOff(void) {
     // 高度控制目标
-    static float AltCtlTarget = 60;
+    static float AltCtlTarget = 100;
     float altitude = GetCopterPosition().z;
 
     static bool FinishTakeOff;
