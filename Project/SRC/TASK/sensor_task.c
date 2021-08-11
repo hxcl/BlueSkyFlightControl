@@ -16,7 +16,7 @@
 #include "magnetometer.h"
 #include "barometer.h"
 #include "gps.h"
-#include "ToF_altimeter.h"
+#include "ToFaltimeter.h"
 #include "optflow.h"
 
 xTaskHandle imuDataPreTreatTask;

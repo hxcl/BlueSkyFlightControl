@@ -17,7 +17,7 @@
 #include "gps.h"
 #include "optflow.h"
 #include "barometer.h"
-#include "ToF_altimeter.h"
+#include "ToFaltimeter.h"
 #include "flightStatus.h"
 
 #include "FreeRTOS.h"

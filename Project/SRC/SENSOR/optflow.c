@@ -6,7 +6,7 @@
 
 #include "boardConfigBlueSkyV3.h"
 #include "gyroscope.h"
-#include "ToF_altimeter.h"
+#include "ToFaltimeter.h"
 #include "navigation.h"
 #include "lowPassFilter.h"
 #include "LC302.h"
